@@ -18,8 +18,8 @@
         "forceConsistentCasingInFileNames": false,
         "noFallthroughCasesInSwitch": false,
         "paths": {
-            "@app/config": ["libs/config/src"],
-            "@app/config/*": ["libs/config/src/*"]
+            "@app/type-orm-config": ["libs/type-orm-config/src"],
+            "@app/type-orm-config/*": ["libs/type-orm-config/src/*"]
         }
     }
 }

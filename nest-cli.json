@@ -19,13 +19,13 @@
                 "tsConfigPath": "apps/api/tsconfig.app.json"
             }
         },
-        "config": {
+        "type-orm-config": {
             "type": "library",
-            "root": "libs/config",
+            "root": "libs/type-orm-config",
             "entryFile": "index",
-            "sourceRoot": "libs/config/src",
+            "sourceRoot": "libs/type-orm-config/src",
             "compilerOptions": {
-                "tsConfigPath": "libs/config/tsconfig.lib.json"
+                "tsConfigPath": "libs/type-orm-config/tsconfig.lib.json"
             }
         }
     }
