@@ -17,7 +17,13 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./apps/api/test/jest-e2e.json"
+        "test:e2e": "jest --config ./apps/api/test/jest-e2e.json",
+        "typeorm": "ts-node --require tsconfig-paths/register ./node_modules/typeorm/cli",
+        "typeorm:mysql-dataSource": "npm run typeorm -- --dataSource ./libs/type-orm-config/src/mysql-typeorm.config.ts",
+        "migration:create": "npm run typeorm -- migration:create ./mysql-migrations/$npm_config_name",
+        "migration:generate": "npm run typeorm:mysql-dataSource --  migration:generate ./mysql-migrations/$npm_config_name",
+        "migration:run": "npm run typeorm:mysql-dataSource -- migration:run",
+        "migration:revert": "npm run typeorm:mysql-dataSource -- migration:revert"
     },
     "dependencies": {
         "@nestjs/common": "^9.0.0",
@@ -74,7 +80,8 @@
             "<rootDir>/libs/"
         ],
         "moduleNameMapper": {
-            "^@app/type-orm-config(|/.*)$": "<rootDir>/libs/type-orm-config/src/$1"
+            "^@libs/type-orm-config(|/.*)$": "<rootDir>/libs/type-orm-config/src/$1",
+            "^@libs/entity(|/.*)$": "<rootDir>/libs/entity/src/$1"
         }
     }
 }

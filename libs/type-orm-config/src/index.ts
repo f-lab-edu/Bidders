@@ -1,1 +1,1 @@
-export * from './mysql-config.service';
+export * from './mysql-typeorm-config.service';

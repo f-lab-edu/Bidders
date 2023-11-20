@@ -17,9 +17,12 @@
         "strictBindCallApply": false,
         "forceConsistentCasingInFileNames": false,
         "noFallthroughCasesInSwitch": false,
+        "esModuleInterop": true,
         "paths": {
-            "@app/type-orm-config": ["libs/type-orm-config/src"],
-            "@app/type-orm-config/*": ["libs/type-orm-config/src/*"]
+            "@libs/type-orm-config": ["libs/type-orm-config/src"],
+            "@libs/type-orm-config/*": ["libs/type-orm-config/src/*"],
+            "@libs/entity": ["libs/entity/src"],
+            "@libs/entity/*": ["libs/entity/src/*"]
         }
     }
 }
