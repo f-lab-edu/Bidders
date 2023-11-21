@@ -6,6 +6,7 @@ import { Category } from '@libs/entity/category';
 import { AppDataSource } from '@libs/type-orm-config/mysql-typeorm.config';
 import { Repository } from 'typeorm';
 
+// Entity 간의 관계성 확인 테스트
 describe('Entity Relations', () => {
     let categoryRepo: Repository<Category>;
     let userRepo: Repository<User>;
@@ -99,25 +100,35 @@ describe('Entity Relations', () => {
         await AppDataSource.destroy(); // Closes connection with the database
     });
 
-    it('Get auction item', async () => {
+    it('Get auction item with user, category', async () => {
         const [auctionItem] = await auctionItemRepo.find();
         const item = await auctionItemRepo.findOne({
             where: { id: auctionItem.id },
             relations: ['user', 'category'],
         });
         console.log('auction item', item);
+        expect(item).toBeDefined();
+        expect(item.user).toBeDefined();
+        expect(item.category).toBeDefined();
     });
 
     it('Get user with auction items', async () => {
         const [user] = await userRepo.find();
+        expect(user.auction_items).toBeUndefined();
+
         const userWithAuctionItems = await userRepo.findOne({
             where: { id: user.id },
             relations: ['auction_items'],
         });
         console.log('user with auction items', userWithAuctionItems);
+        expect(userWithAuctionItems).toBeDefined();
+        expect(userWithAuctionItems.auction_items).toBeDefined();
+        expect(userWithAuctionItems.auction_items[0]).toBeInstanceOf(
+            AuctionItem,
+        );
     });
 
-    it('Update category', async () => {
+    it('On category update, auction item c_code update (CASCADE)', async () => {
         await categoryRepo.update('0001', { c_code: '0002' });
         const item = await auctionItemRepo.findOne({
             where: { c_code: '0002' },
@@ -125,7 +136,7 @@ describe('Entity Relations', () => {
         expect(item.c_code).toBe('0002');
     });
 
-    it('Delete category', async () => {
+    it('On category delete, auction item c_code set null', async () => {
         await categoryRepo.delete('0000');
         const item = await auctionItemRepo.findOne({
             where: { c_code: null },
@@ -133,7 +144,7 @@ describe('Entity Relations', () => {
         expect(item.c_code).toBe(null);
     });
 
-    it('Delete user', async () => {
+    it('On user delete, auction item delete (CASCADE)', async () => {
         const [user] = await userRepo.find();
         const userIdx = user.id;
 
@@ -150,20 +161,17 @@ describe('Entity Relations', () => {
 
         const [user] = await userRepo.find({ relations: ['auction_items'] });
         console.log('user', user);
+        expect(user.auction_items).toHaveLength(1);
     });
 
-    it('Select bids', async () => {
-        const bids = await bidRepo.find();
-        console.log('bids', bids);
-    });
-
-    it('Bids after delete item', async () => {
+    it('On auction item delete, bids delete (CASCADE)', async () => {
         const bids = await bidRepo.find();
         console.log('bids', bids);
 
         await auctionItemRepo.delete(bids[0].item_id);
         const bidsAfterDelete = await bidRepo.find();
         console.log('bids after delete item', bidsAfterDelete);
+        expect(bidsAfterDelete[0]).toBeUndefined();
     });
 
     it('Get auction item with bids', async () => {
@@ -173,17 +181,25 @@ describe('Entity Relations', () => {
             relations: ['bids'],
         });
         console.log('itemWithBids', itemWithBids);
+        expect(itemWithBids.bids[0]).toBeDefined();
     });
 
     it('Get auction item with result', async () => {
-        const items = await auctionItemRepo.find({
+        const [item] = await auctionItemRepo.find({
             relations: ['auction_result'],
         });
-        console.log('items', items);
+        console.log('item', item);
+        expect(item.auction_result).toBeDefined();
     });
 
     it('Get bid with result', async () => {
-        const bids = await bidRepo.find({ relations: ['auction_result'] });
-        console.log('bids', bids);
+        const [bid] = await bidRepo.find({
+            order: {
+                bid_amount: 'DESC',
+            },
+            relations: ['auction_result'],
+        });
+        console.log('bid', bid);
+        expect(bid.auction_result).toBeDefined();
     });
 });

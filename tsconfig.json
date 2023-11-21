@@ -1,42 +1,30 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "es2017",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
-    "esModuleInterop": true,
-    "paths": {
-      "@libs/type-orm-config": [
-        "libs/type-orm-config/src"
-      ],
-      "@libs/type-orm-config/*": [
-        "libs/type-orm-config/src/*"
-      ],
-      "@libs/entity": [
-        "libs/entity/src"
-      ],
-      "@libs/entity/*": [
-        "libs/entity/src/*"
-      ],
-      "@libs/swagger": [
-        "libs/swagger/src"
-      ],
-      "@libs/swagger/*": [
-        "libs/swagger/src/*"
-      ]
+    "compilerOptions": {
+        "module": "commonjs",
+        "declaration": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "target": "es2017",
+        "sourceMap": true,
+        "outDir": "./dist",
+        "baseUrl": "./",
+        "incremental": true,
+        "skipLibCheck": true,
+        "strictNullChecks": false,
+        "noImplicitAny": false,
+        "strictBindCallApply": false,
+        "forceConsistentCasingInFileNames": false,
+        "noFallthroughCasesInSwitch": false,
+        "esModuleInterop": true,
+        "paths": {
+            "@libs/type-orm-config": ["libs/type-orm-config/src"],
+            "@libs/type-orm-config/*": ["libs/type-orm-config/src/*"],
+            "@libs/entity": ["libs/entity/src"],
+            "@libs/entity/*": ["libs/entity/src/*"],
+            "@libs/swagger": ["libs/swagger/src"],
+            "@libs/swagger/*": ["libs/swagger/src/*"]
+        }
     }
-  }
 }
