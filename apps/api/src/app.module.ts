@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MySqlTypeOrmConfigService } from '@libs/type-orm-config';
+import { SwaggerModule } from '@libs/swagger';
 
 @Module({
     imports: [
@@ -11,6 +12,7 @@ import { MySqlTypeOrmConfigService } from '@libs/type-orm-config';
         TypeOrmModule.forRootAsync({
             useClass: MySqlTypeOrmConfigService,
         }),
+        SwaggerModule,
     ],
     controllers: [AppController],
     providers: [AppService],
