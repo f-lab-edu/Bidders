@@ -1,9 +1,9 @@
+import { AppDataSource } from '@libs/database';
 import { User } from '@libs/entity';
 import { AuctionItem } from '@libs/entity/auction-item';
 import { AuctionResult } from '@libs/entity/auction-result';
 import { Bid } from '@libs/entity/bid';
 import { Category } from '@libs/entity/category';
-import { AppDataSource } from '@libs/type-orm-config/mysql-typeorm.config';
 import { Repository } from 'typeorm';
 
 // Entity 간의 관계성 확인 테스트
