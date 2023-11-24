@@ -24,7 +24,9 @@
             "@libs/entity": ["libs/entity/src"],
             "@libs/entity/*": ["libs/entity/src/*"],
             "@libs/swagger": ["libs/swagger/src"],
-            "@libs/swagger/*": ["libs/swagger/src/*"]
+            "@libs/swagger/*": ["libs/swagger/src/*"],
+            "@libs/util": ["libs/util/src"],
+            "@libs/util/*": ["libs/util/src/*"]
         }
     }
 }
