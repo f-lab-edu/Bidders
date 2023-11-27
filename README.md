@@ -54,3 +54,49 @@ $ npm run test
 ## Dev mode
 $ npm run start:dev
 ```
+
+<br>
+
+## Authentication flow
+
+### Sign up 프로세스
+
+```mermaid
+sequenceDiagram
+
+Client-)Server: 1. POST /auth/signup
+Note over Server: email 조회
+Server--)Client: 400 Bad Request - Email in use
+Note over Server: password 해싱
+Note over Server: user 정보 저장
+Note over Server: atk, rtk 생성 (JsonWebToken)
+Note over Server: rtk 저장 (Redis)
+Server-)Client: 2. atk, rtk 발급
+Client-)Server: 3. atk로 리소스 요청
+Note over Server: Guard에서 인증/인가
+Server--)Client: 400 Bad Request - token is null
+Server--)Client: 401 Unauthorized - token is invalid
+Server-)Client: 4. 리소스 응답
+```
+
+<br>
+
+### Sign in 프로세스
+
+```mermaid
+sequenceDiagram
+
+Client-)Server: 1. POST /auth/signin { email, password }
+Note over Server: email 조회
+Server--)Client: 404 Not Found - User not found
+Note over Server: password 비교
+Server--)Client: 400 Bad Request - Invalid password
+Note over Server: atk, rtk 생성 (JsonWebToken)
+Note over Server: rtk 저장 (Redis)
+Server-)Client: 2. atk, rtk 발급
+Client-)Server: 3. atk로 리소스 요청
+Note over Server: Guard에서 인증/인가
+Server--)Client: 400 Bad Request - token is null
+Server--)Client: 401 Unauthorized - token is invalid
+Server-)Client: 4. 리소스 응답
+```
