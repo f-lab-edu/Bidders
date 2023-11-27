@@ -1,7 +1,8 @@
-import { User } from '@libs/entity';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'apps/api/src/user/entities/user.entity';
 import jwt from 'jsonwebtoken';
+import { IUserPayload } from './interfaces/jwt.interface';
 
 @Injectable()
 export class JwtService {
@@ -24,9 +25,9 @@ export class JwtService {
                 token,
                 this.configService.get('JWT_SECRET'),
             );
-            return decoded;
+            return decoded as IUserPayload;
         } catch (error) {
-            throw new Error(error.message);
+            throw new Error('JWT_MALFORMED');
         }
     }
 }

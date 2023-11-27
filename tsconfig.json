@@ -21,14 +21,14 @@
         "paths": {
             "@libs/database": ["libs/database/src"],
             "@libs/database/*": ["libs/database/src/*"],
-            "@libs/entity": ["libs/entity/src"],
-            "@libs/entity/*": ["libs/entity/src/*"],
             "@libs/swagger": ["libs/swagger/src"],
             "@libs/swagger/*": ["libs/swagger/src/*"],
             "@libs/common": ["libs/common/src"],
             "@libs/common/*": ["libs/common/src/*"],
             "@libs/util": ["libs/util/src"],
-            "@libs/util/*": ["libs/util/src/*"]
+            "@libs/util/*": ["libs/util/src/*"],
+            "@libs/dto": ["libs/dto/src"],
+            "@libs/dto/*": ["libs/dto/src/*"]
         }
     }
 }

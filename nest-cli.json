@@ -28,15 +28,6 @@
                 "tsConfigPath": "libs/database/tsconfig.lib.json"
             }
         },
-        "entity": {
-            "type": "library",
-            "root": "libs/entity",
-            "entryFile": "index",
-            "sourceRoot": "libs/entity/src",
-            "compilerOptions": {
-                "tsConfigPath": "libs/entity/tsconfig.lib.json"
-            }
-        },
         "swagger": {
             "type": "library",
             "root": "libs/swagger",
@@ -62,6 +53,15 @@
             "sourceRoot": "libs/util/src",
             "compilerOptions": {
                 "tsConfigPath": "libs/util/tsconfig.lib.json"
+            }
+        },
+        "dto": {
+            "type": "library",
+            "root": "libs/dto",
+            "entryFile": "index",
+            "sourceRoot": "libs/dto/src",
+            "compilerOptions": {
+                "tsConfigPath": "libs/dto/tsconfig.lib.json"
             }
         }
     }

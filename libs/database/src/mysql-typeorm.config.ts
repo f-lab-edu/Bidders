@@ -18,10 +18,10 @@ export function dataSourceConfig(configService: ConfigService) {
         synchronize: false,
         logging: configService.get<string>('NODE_ENV') === 'development',
         entities: [
-            path.join(__dirname, '../../', 'entity', '**', '*.entity.ts'),
+            path.join(__dirname, '../../../', 'apps', '**', '*.entity.{ts,js}'),
         ],
         migrations: [
-            path.join(__dirname, '../../../', 'mysql-migrations', '*.ts'),
+            path.join(__dirname, '../../../', 'mysql-migrations', '*.{ts,js}'),
         ],
         migrationsTableName: 'migrations',
     };

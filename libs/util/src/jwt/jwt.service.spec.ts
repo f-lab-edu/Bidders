@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from './jwt.service';
 import { ConfigService } from '@nestjs/config';
-import { User } from '@libs/entity';
+import { User } from 'apps/api/src/user/entities/user.entity';
 
 describe('JwtService', () => {
     let service: JwtService;
@@ -29,7 +29,7 @@ describe('JwtService', () => {
     it('creates jwt', () => {
         token = service.create(
             {
-                id: 1,
+                id: 'uuid',
                 email: 'test@test.com',
             } as User,
             '1h',
