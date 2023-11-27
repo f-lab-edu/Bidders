@@ -1,0 +1,30 @@
+### Create a new user
+# @name signupRequest
+POST http://localhost:4000/user/signup
+Content-Type: application/json
+
+{
+    "email": "test2@bidders.com",
+    "password": "1234",
+    "username": "test-user2"
+}
+
+### Sign in
+# @name signinRequest
+POST http://localhost:4000/user/signin
+Content-Type: application/json
+
+{
+    "email": "test2@bidders.com",
+    "password": "1234"
+}
+
+###
+@token = {{signinRequest.response.body.atk}}
+###
+
+### Who am i
+GET http://localhost:4000/user/me
+Authorization: Bearer {{token}}
+
+

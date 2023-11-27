@@ -31,7 +31,7 @@ export class AuthService {
             const newUser = await this.userRepo.create(createUserDto);
             const tokens = this.generateTokens(newUser);
 
-            return { atk: tokens.atk };
+            return tokens;
         } catch (error) {
             throw new BadRequestException(error.message);
         }
@@ -47,7 +47,7 @@ export class AuthService {
             await this.isValidateUser(signInDto.password, storedUser.password);
             const tokens = this.generateTokens(storedUser);
 
-            return { atk: tokens.atk, rtk: null };
+            return tokens;
         } catch (error) {
             if (error.message === 'NOT_FOUND')
                 throw new NotFoundException('User not found');
