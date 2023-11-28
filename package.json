@@ -26,6 +26,7 @@
         "migration:revert": "npm run typeorm:mysql-dataSource -- migration:revert"
     },
     "dependencies": {
+        "@liaoliaots/nestjs-redis": "^9.0.5",
         "@nestjs/common": "^9.0.0",
         "@nestjs/config": "^3.1.1",
         "@nestjs/core": "^9.0.0",
@@ -35,6 +36,7 @@
         "bcrypt": "^5.1.1",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.0",
+        "ioredis": "^5.3.2",
         "jsonwebtoken": "^9.0.2",
         "mysql2": "^3.6.3",
         "reflect-metadata": "^0.1.13",
@@ -52,6 +54,7 @@
         "@types/jsonwebtoken": "^9.0.5",
         "@types/node": "18.11.18",
         "@types/supertest": "^2.0.11",
+        "@types/uuid": "^9.0.7",
         "@typescript-eslint/eslint-plugin": "^5.0.0",
         "@typescript-eslint/parser": "^5.0.0",
         "eslint": "^8.0.1",

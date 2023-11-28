@@ -20,11 +20,34 @@ Content-Type: application/json
 }
 
 ###
-@token = {{signinRequest.response.body.atk}}
+@atk = {{signinRequest.response.body.atk}}
+@rtk = {{signinRequest.response.body.rtk}}
 ###
 
 ### Who am i
 GET http://localhost:4000/user/me
-Authorization: Bearer {{token}}
+Authorization: Bearer {{atk}}
+
+
+### Refresh atk with rtk
+# @name refreshTokenRequest
+GET http://localhost:4000/auth/refresh
+Authorization: Bearer {{rtk}}
+
+
+###
+@newAtk = {{refreshTokenRequest.response.body.atk}}
+@newRtk = {{refreshTokenRequest.response.body.rtk}}
+###
+
+
+### Who am i with new atk
+GET http://localhost:4000/user/me
+Authorization: Bearer {{newAtk}}
+
+
+### Refresh atk with new rtk
+GET http://localhost:4000/auth/refresh
+Authorization: Bearer {{newRtk}}
 
 

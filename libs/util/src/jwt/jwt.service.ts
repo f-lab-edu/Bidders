@@ -1,17 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'apps/api/src/user/entities/user.entity';
 import jwt from 'jsonwebtoken';
-import { IUserPayload } from './interfaces/jwt.interface';
+import { IExpireOpt, IUserPayload } from './interfaces/jwt.interface';
+import { RedisClientService } from '@libs/database';
 
 @Injectable()
 export class JwtService {
-    constructor(private readonly configService: ConfigService) {}
+    constructor(
+        private readonly configService: ConfigService,
+        private readonly redisClientService: RedisClientService,
+    ) {}
 
-    create(user: User, expiration?: string) {
+    create(userPayload: IUserPayload, expiration?: string) {
         const payload = {
-            id: user.id,
-            email: user.email,
+            id: userPayload.id,
+            email: userPayload.email,
         };
         const token = jwt.sign(payload, this.configService.get('JWT_SECRET'), {
             expiresIn: expiration ?? '1h',
@@ -29,5 +32,28 @@ export class JwtService {
         } catch (error) {
             throw new Error('JWT_MALFORMED');
         }
+    }
+
+    delete(key: string) {
+        this.redisClientService.deleteRtk(key);
+    }
+
+    async generateTokens(userPayload: IUserPayload, expireOpt: IExpireOpt) {
+        const atk = this.create(userPayload, expireOpt.atk_expire);
+        const rtk = this.create(userPayload, expireOpt.rtk_expire);
+
+        await this.redisClientService.setRtk(
+            userPayload.id,
+            rtk,
+            expireOpt.rtk_expire,
+        );
+
+        return { atk, rtk };
+    }
+
+    async validateRtk(userId: string, rtk: string) {
+        const storedRtk = await this.redisClientService.getRtk(userId);
+        if (rtk !== storedRtk) return false;
+        return true;
     }
 }

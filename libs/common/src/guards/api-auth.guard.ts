@@ -18,13 +18,13 @@ export class ApiAuthGuard implements CanActivate {
             throw new BadRequestException('api-token is null');
 
         const token = authorizationHeader.split('Bearer ')[1];
-        const payload = this.decode(token);
+        const payload = this.decodeToken(token);
         request.user = { id: payload.id, email: payload.email };
 
         return true;
     }
 
-    private decode(token: string) {
+    private decodeToken(token: string) {
         try {
             const decoded = this.jwtService.verify(token);
             return decoded;

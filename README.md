@@ -100,3 +100,25 @@ Server--)Client: 400 Bad Request - token is null
 Server--)Client: 401 Unauthorized - token is invalid
 Server-)Client: 4. 리소스 응답
 ```
+
+<br>
+
+### Access token 재발급 프로세스
+
+-   **_RTR(Refresh Token Rotation) 도입_**
+-   **_JWT로 Refresh Token 생성_**
+
+```mermaid
+sequenceDiagram
+
+Client-)Server: 1. GET /auth/refresh (rtk로 재발급 요청)
+Note over Server: Guard에서 재발급 프로세스 수행
+Server--)Client: 400 Bad Request - token is null
+Note over Server: Verify rtk
+Server--)Client: 401 Unauthorized - token is invalid
+Note over Server: Redis에 저장된 rtk 값 비교 (key : value = userId : rtk)
+Server--)Client: 403 Forbidden - should login again (서버는 Redis key 삭제)
+Note over Server: atk & rtk 모두 재발급
+Note over Server: Redis에 저장된 rtk 갱신
+Server-)Client: 2. atk, rtk
+```

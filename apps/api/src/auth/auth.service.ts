@@ -6,7 +6,6 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@libs/util/jwt';
-import { User } from '../user/entities/user.entity';
 import { SignInDto } from '@libs/dto/user/sign-in.dto';
 import { CryptoService } from '@libs/util/crypto';
 
@@ -29,7 +28,10 @@ export class AuthService {
                 createUserDto.password,
             );
             const newUser = await this.userRepo.create(createUserDto);
-            const tokens = this.generateTokens(newUser);
+            const tokens = await this.jwtService.generateTokens(newUser, {
+                atk_expire: '1h',
+                rtk_expire: '1d',
+            });
 
             return tokens;
         } catch (error) {
@@ -39,13 +41,14 @@ export class AuthService {
 
     async signin(signInDto: SignInDto) {
         try {
-            const storedUser = await this.userRepo.findOneByEmail(
+            const user = await this.validateUser(
                 signInDto.email,
+                signInDto.password,
             );
-            if (!storedUser) throw new Error('NOT_FOUND');
-
-            await this.isValidateUser(signInDto.password, storedUser.password);
-            const tokens = this.generateTokens(storedUser);
+            const tokens = await this.jwtService.generateTokens(user, {
+                atk_expire: '1h',
+                rtk_expire: '1d',
+            });
 
             return tokens;
         } catch (error) {
@@ -55,17 +58,16 @@ export class AuthService {
         }
     }
 
-    private async isValidateUser(plain: string, hashed: string) {
-        const match = await this.cryptoService.compare(plain, hashed);
-        if (!match) throw new Error('Invalid password');
+    private async validateUser(email: string, password: string) {
+        const storedUser = await this.userRepo.findOneByEmail(email);
+        if (!storedUser) throw new Error('NOT_FOUND');
+
+        await this.validatePassword(password, storedUser.password);
+        return storedUser;
     }
 
-    private generateTokens(user: User) {
-        const atk = this.jwtService.create(user, '1h');
-        /**
-         *  TODO
-         *  rtk 생성 & redis 저장
-         */
-        return { atk, rtk: null };
+    private async validatePassword(plain: string, hashed: string) {
+        const match = await this.cryptoService.compare(plain, hashed);
+        if (!match) throw new Error('Invalid password');
     }
 }
