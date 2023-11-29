@@ -1,0 +1,53 @@
+### Create a new user
+# @name signupRequest
+POST http://localhost:4000/user/signup
+Content-Type: application/json
+
+{
+    "email": "test2@bidders.com",
+    "password": "1234",
+    "username": "test-user2"
+}
+
+### Sign in
+# @name signinRequest
+POST http://localhost:4000/user/signin
+Content-Type: application/json
+
+{
+    "email": "test2@bidders.com",
+    "password": "1234"
+}
+
+###
+@atk = {{signinRequest.response.body.atk}}
+@rtk = {{signinRequest.response.body.rtk}}
+###
+
+### Who am i
+GET http://localhost:4000/user/me
+Authorization: Bearer {{atk}}
+
+
+### Refresh atk with rtk
+# @name refreshTokenRequest
+GET http://localhost:4000/auth/refresh
+Authorization: Bearer {{rtk}}
+
+
+###
+@newAtk = {{refreshTokenRequest.response.body.atk}}
+@newRtk = {{refreshTokenRequest.response.body.rtk}}
+###
+
+
+### Who am i with new atk
+GET http://localhost:4000/user/me
+Authorization: Bearer {{newAtk}}
+
+
+### Refresh atk with new rtk
+GET http://localhost:4000/auth/refresh
+Authorization: Bearer {{newRtk}}
+
+
