@@ -2,7 +2,7 @@ import { CryptoService } from '@libs/util/crypto';
 import { User } from '../user/entities/user.entity';
 import { UserRepository } from '../user/entities/user.repository';
 import { AuthService } from './auth.service';
-import { JwtService } from '@libs/util/jwt';
+import { IExpireOpt, IUserPayload, JwtService } from '@libs/util/jwt';
 import { Test } from '@nestjs/testing';
 import { CreateUserDto, UserDto } from '@libs/dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
@@ -54,6 +54,15 @@ describe('AuthService', () => {
             create: (userDto: UserDto, expiration: string) => {
                 return userDto.id + 'token' + expiration;
             },
+            generateTokens: (
+                userPayload: IUserPayload,
+                expireOpt: IExpireOpt,
+            ) => {
+                return Promise.resolve({
+                    atk: `${userPayload.id}.access-token.${expireOpt.atk_expire}`,
+                    rtk: `${userPayload.id}.refresh-token.${expireOpt.rtk_expire}`,
+                });
+            },
         };
 
         const module = await Test.createTestingModule({
@@ -78,7 +87,9 @@ describe('AuthService', () => {
             password: 'mypassword',
             username: 'test-user',
         });
+
         expect(signUpResult.atk).toBeDefined();
+        expect(signUpResult.rtk).toBeDefined();
     });
 
     it('throws an error if user signs up with email that is in use', async () => {
