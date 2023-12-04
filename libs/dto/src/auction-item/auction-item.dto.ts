@@ -1,7 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
+
+const timeOptions = {
+    timeZone: 'Asia/Seoul',
+    hour12: false,
+};
 
 export class AuctionItemDto {
+    @ApiProperty({ description: '상품 id', example: 1 })
+    @Expose()
+    id: number;
+
     @ApiProperty({ description: '카테고리 code', example: '0001' })
     @Expose()
     c_code: string;
@@ -41,6 +50,7 @@ export class AuctionItemDto {
         example: '2023-12-12 15:00:00',
     })
     @Expose()
+    @Transform(({ value }) => value.toLocaleString('en-US', timeOptions))
     start_datetime: Date;
 
     @ApiProperty({
@@ -48,6 +58,7 @@ export class AuctionItemDto {
         example: '2023-12-15 22:00:00',
     })
     @Expose()
+    @Transform(({ value }) => value.toLocaleString('en-US', timeOptions))
     end_datetime: Date;
 
     @ApiProperty({
@@ -56,4 +67,23 @@ export class AuctionItemDto {
     })
     @Expose()
     start_price: number;
+
+    @ApiProperty({
+        description: '상품 등록 시간',
+        example: '2023-12-15 22:00:00',
+    })
+    @Expose()
+    @Transform(({ value }) => value.toLocaleString('en-US', timeOptions))
+    created_at: Date;
+}
+
+export class AuctionItemListDto {
+    @ApiProperty({ description: '전체 개수', example: 5 })
+    @Expose()
+    total: number;
+
+    @ApiProperty({ description: '상품 데이터 리스트', type: [AuctionItemDto] })
+    @Expose()
+    @Type(() => AuctionItemDto)
+    items: AuctionItemDto[];
 }

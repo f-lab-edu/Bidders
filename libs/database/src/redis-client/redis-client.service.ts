@@ -20,6 +20,16 @@ export class RedisClientService {
         this.redis.del(key);
     }
 
+    async get(key: string) {
+        const value = await this.redis.get(key);
+        return value;
+    }
+
+    async keys(pattern: string) {
+        const keys = await this.redis.keys(pattern);
+        return keys;
+    }
+
     private convertToSeconds(timeStr: string) {
         const unit = timeStr.slice(-1);
         const value = parseInt(timeStr.slice(0, -1));

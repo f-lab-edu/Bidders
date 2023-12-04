@@ -25,9 +25,9 @@ import { AuctionItemModule } from './auction-item/auction-item.module';
             inject: [ConfigService],
         }),
         CacheModule.registerAsync({
+            isGlobal: true,
             useFactory: async (configService: ConfigService) => {
                 return {
-                    isGlobal: true,
                     store: redisStore,
                     host: configService.get('REDIS_HOST'),
                     port: configService.get('REDIS_PORT'),
