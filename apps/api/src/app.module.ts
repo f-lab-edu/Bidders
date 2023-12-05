@@ -10,8 +10,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SwaggerModule } from '@libs/swagger';
 import { dataSourceConfig } from '@libs/database';
-import { LoggerMiddleware } from '@libs/common';
-import { APP_PIPE } from '@nestjs/core';
+import { GlobalExceptionFilter, LoggerMiddleware } from '@libs/common';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import redisStore from 'cache-manager-ioredis';
@@ -48,6 +48,10 @@ import { AuctionItemModule } from './auction-item/auction-item.module';
                 whitelist: true,
                 transform: true,
             }),
+        },
+        {
+            provide: APP_FILTER,
+            useClass: GlobalExceptionFilter,
         },
     ],
 })

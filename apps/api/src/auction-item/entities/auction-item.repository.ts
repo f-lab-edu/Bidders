@@ -8,6 +8,11 @@ import {
     UpdateAuctionItemDto,
 } from '@libs/dto';
 import { plainToInstance } from 'class-transformer';
+import {
+    AccessNotAllowedException,
+    ItemNotFoundException,
+    ItemUpdateFailedException,
+} from '@libs/common';
 
 @Injectable()
 export class AuctionItemRepository {
@@ -33,7 +38,6 @@ export class AuctionItemRepository {
 
     async findOne(id: number) {
         const item = await this.repo.findOneBy({ id });
-        if (!item) throw new Error('NOT_FOUND');
         return item;
     }
 
@@ -42,9 +46,9 @@ export class AuctionItemRepository {
             where: { id },
             relations: ['bids'],
         });
-        if (!itemWithBids) throw new Error('NOT_FOUND');
+
         // 입찰 내역 정렬
-        if (itemWithBids.bids.length) {
+        if (itemWithBids && itemWithBids.bids.length) {
             itemWithBids.bids = [
                 ...itemWithBids.bids.sort((a, b) =>
                     this.descByAmount(a.bid_amount, b.bid_amount),
@@ -55,33 +59,23 @@ export class AuctionItemRepository {
     }
 
     async update(
-        id: number,
-        userId: string,
+        auctionItem: AuctionItem,
         updateAuctionItemDto: UpdateAuctionItemDto,
     ) {
-        const item = await this.repo.findOne({
-            where: { id, user_id: userId },
-        });
-        if (!item) throw new Error('NOT_FOUND');
-        if (item.start_datetime < new Date()) throw new Error('NOT_ALLOWED');
-
-        Object.assign(item, updateAuctionItemDto);
-        return await this.repo.save(item);
+        Object.assign(auctionItem, updateAuctionItemDto);
+        return await this.repo.save(auctionItem);
     }
 
-    async updateStatus(id: number) {
-        const item = await this.findOne(id);
-        const status = item.status ? 0 : 1;
-        const result = await this.repo.update(item.id, { status });
-        if (!result.affected) throw new Error('UPDATE_FAILED');
-        return Object.assign(item, { status });
+    async updateStatus(id: number, status: number) {
+        const result = await this.repo.update(id, { status });
+        if (!result.affected) throw new ItemUpdateFailedException();
+        return true;
     }
 
-    async updateLikes(id: number) {
-        const item = await this.findOne(id);
-        const result = await this.repo.update(item.id, { likes: ++item.likes });
-        if (!result.affected) throw new Error('UPDATE_FAILED');
-        return Object.assign(item, { likes: item.likes });
+    async updateLikes(id: number, likes: number) {
+        const result = await this.repo.update(id, { likes });
+        if (!result.affected) throw new ItemUpdateFailedException();
+        return true;
     }
 
     async delete(id: number, userId: string) {
@@ -96,8 +90,8 @@ export class AuctionItemRepository {
             // 모든 데이터베이스 작업은 queryRunner.manager를 통해 수행되어야 한다
             const repo = queryRunner.manager.getRepository(AuctionItem);
             const item = await repo.findOneBy({ id });
-            if (!item) throw new Error('NOT_FOUND');
-            if (item.user_id !== userId) throw new Error('NOT_ALLOWED');
+            if (!item) throw new ItemNotFoundException();
+            if (item.user_id !== userId) throw new AccessNotAllowedException();
 
             const result = await repo.delete(id);
 
@@ -105,7 +99,6 @@ export class AuctionItemRepository {
             return result;
         } catch (error) {
             await queryRunner.rollbackTransaction();
-            throw new Error(error.message);
         } finally {
             await queryRunner.release();
         }

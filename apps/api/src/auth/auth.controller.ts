@@ -1,8 +1,7 @@
-import { HttpExceptionFilter, TokenRefreshGuard } from '@libs/common';
-import { Token } from '@libs/common/decorators';
+import { Token, TokenRefreshGuard } from '@libs/common';
 import { SignSuccessDto } from '@libs/dto';
 import { IToken } from '@libs/util/jwt';
-import { Controller, Get, UseFilters, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import {
     ApiBearerAuth,
     ApiOkResponse,
@@ -12,7 +11,6 @@ import {
 
 @ApiTags('Auth')
 @Controller('auth')
-@UseFilters(HttpExceptionFilter)
 export class AuthController {
     @ApiOperation({ summary: '엑세스 토큰 갱신' })
     @ApiOkResponse({ description: 'atk & rtk 갱신', type: SignSuccessDto })

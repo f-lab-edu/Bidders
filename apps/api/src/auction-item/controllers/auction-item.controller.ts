@@ -1,8 +1,4 @@
-import {
-    ApiAuthGuard,
-    HttpExceptionFilter,
-    SerializeInterceptor,
-} from '@libs/common';
+import { ApiAuthGuard, SerializeInterceptor, User } from '@libs/common';
 import {
     Body,
     Controller,
@@ -13,7 +9,6 @@ import {
     Patch,
     Post,
     Put,
-    UseFilters,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
@@ -33,13 +28,11 @@ import {
     CreateAuctionItemDto,
     UpdateAuctionItemDto,
 } from '@libs/dto';
-import { User } from '@libs/common/decorators';
 import { IUserPayload } from '@libs/util/jwt';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('Auction-item')
 @Controller('auction')
-@UseFilters(HttpExceptionFilter)
 export class AuctionItemController {
     constructor(private readonly auctionItemService: AuctionItemService) {}
 

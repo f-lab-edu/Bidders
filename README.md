@@ -66,7 +66,7 @@ sequenceDiagram
 
 Client-)Server: 1. POST /auth/signup
 Note over Server: email 조회
-Server--)Client: 400 Bad Request - Email in use
+Server--)Client: 409 Conflict - Email in use
 Note over Server: password 해싱
 Note over Server: user 정보 저장
 Note over Server: atk, rtk 생성 (JsonWebToken)
@@ -74,8 +74,8 @@ Note over Server: rtk 저장 (Redis)
 Server-)Client: 2. atk, rtk 발급
 Client-)Server: 3. atk로 리소스 요청
 Note over Server: Guard에서 인증/인가
-Server--)Client: 400 Bad Request - token is null
-Server--)Client: 401 Unauthorized - token is invalid
+Server--)Client: 401 Unauthorized - Token is missing
+Server--)Client: 400 Bad Request - Token is invalid
 Server-)Client: 4. 리소스 응답
 ```
 
@@ -90,14 +90,14 @@ Client-)Server: 1. POST /auth/signin { email, password }
 Note over Server: email 조회
 Server--)Client: 404 Not Found - User not found
 Note over Server: password 비교
-Server--)Client: 400 Bad Request - Invalid password
+Server--)Client: 401 Unauthorized - Invalid password
 Note over Server: atk, rtk 생성 (JsonWebToken)
 Note over Server: rtk 저장 (Redis)
 Server-)Client: 2. atk, rtk 발급
 Client-)Server: 3. atk로 리소스 요청
 Note over Server: Guard에서 인증/인가
-Server--)Client: 400 Bad Request - token is null
-Server--)Client: 401 Unauthorized - token is invalid
+Server--)Client: 401 Unauthorized - Token is missing
+Server--)Client: 400 Bad Request - Token is invalid
 Server-)Client: 4. 리소스 응답
 ```
 
@@ -113,11 +113,11 @@ sequenceDiagram
 
 Client-)Server: 1. GET /auth/refresh (rtk로 재발급 요청)
 Note over Server: Guard에서 재발급 프로세스 수행
-Server--)Client: 400 Bad Request - token is null
+Server--)Client: 401 Unauthorized - Token is missing
 Note over Server: Verify rtk
-Server--)Client: 401 Unauthorized - token is invalid
+Server--)Client: 400 Bad Request - Token is invalid
 Note over Server: Redis에 저장된 rtk 값 비교 (key : value = userId : rtk)
-Server--)Client: 403 Forbidden - should login again (서버는 Redis key 삭제)
+Server--)Client: 403 Forbidden - Should login again (서버는 Redis key 삭제)
 Note over Server: atk & rtk 모두 재발급
 Note over Server: Redis에 저장된 rtk 갱신
 Server-)Client: 2. atk, rtk

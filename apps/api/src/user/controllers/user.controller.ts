@@ -3,7 +3,6 @@ import {
     Controller,
     Get,
     Post,
-    UseFilters,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
@@ -16,18 +15,12 @@ import {
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger';
-import {
-    ApiAuthGuard,
-    HttpExceptionFilter,
-    SerializeInterceptor,
-} from '@libs/common';
+import { ApiAuthGuard, SerializeInterceptor, User } from '@libs/common';
 import { CreateUserDto, SignInDto, SignSuccessDto, UserDto } from '@libs/dto';
-import { User } from '@libs/common/decorators';
 import { IUserPayload } from '@libs/util/jwt';
 
 @ApiTags('User')
 @Controller('user')
-@UseFilters(HttpExceptionFilter)
 export class UserController {
     constructor(
         private readonly authService: AuthService,
