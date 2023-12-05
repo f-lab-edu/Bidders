@@ -1,12 +1,5 @@
 import { IUserPayload, JwtService } from '@libs/util/jwt';
-import {
-    BadRequestException,
-    CanActivate,
-    ExecutionContext,
-    ForbiddenException,
-    Injectable,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { LoginRequiredException, TokenMissingException } from '../exceptions';
 
 @Injectable()

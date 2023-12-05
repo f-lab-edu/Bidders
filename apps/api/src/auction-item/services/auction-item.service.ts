@@ -1,9 +1,4 @@
-import {
-    BadRequestException,
-    Inject,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { AuctionItemRepository } from '../entities/auction-item.repository';
 import { CreateAuctionItemDto, UpdateAuctionItemDto } from '@libs/dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
