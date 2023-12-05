@@ -21,6 +21,11 @@ export class AuctionItemService {
         createAuctionItemDto: CreateAuctionItemDto,
     ) {
         try {
+            this.validateDatetime(
+                createAuctionItemDto.start_datetime,
+                createAuctionItemDto.end_datetime,
+            );
+
             const item = await this.auctionItemRepo.create(
                 userId,
                 createAuctionItemDto,
@@ -124,5 +129,20 @@ export class AuctionItemService {
     async deleteCacheItem(id: number) {
         await this.cacheManager.del('/auction/items');
         await this.cacheManager.del(`/auction/item/${id}`);
+    }
+
+    private validateDatetime(start: string, end: string) {
+        const oneHourMilliseconds = 60 * 60 * 1000;
+        const now = new Date().getTime();
+        const startDatetime = new Date(start).getTime();
+        const endDatetime = new Date(end).getTime();
+        const interval = endDatetime - startDatetime;
+
+        if (startDatetime < now + oneHourMilliseconds)
+            throw new Error('Invalid start datetime');
+        if (startDatetime >= endDatetime)
+            throw new Error('Invalid end datetime');
+        if (interval < oneHourMilliseconds)
+            throw new Error('Datetime interval must be at least one hour');
     }
 }

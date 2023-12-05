@@ -40,7 +40,7 @@ export class CreateAuctionItemDto {
     })
     @IsDateString()
     @IsNotEmpty()
-    start_datetime: Date;
+    start_datetime: string;
 
     @ApiProperty({
         description: '경매 종료일시',
@@ -48,7 +48,7 @@ export class CreateAuctionItemDto {
     })
     @IsDateString()
     @IsNotEmpty()
-    end_datetime: Date;
+    end_datetime: string;
 
     @ApiProperty({
         description: '시작 가격',
