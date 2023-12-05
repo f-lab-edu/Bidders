@@ -16,6 +16,7 @@ import { UserModule } from './user/user.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import redisStore from 'cache-manager-ioredis';
 import { AuctionItemModule } from './auction-item/auction-item.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { AuctionItemModule } from './auction-item/auction-item.module';
         }),
         SwaggerModule,
         UserModule,
+        CategoryModule,
         AuctionItemModule,
     ],
     controllers: [AppController],

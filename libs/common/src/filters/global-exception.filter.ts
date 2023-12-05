@@ -27,7 +27,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
             response.status(status).json({
                 statusCode: status,
-                message: exception.message || errorResponse['message'],
+                message: errorResponse['message'] || exception.message,
                 error:
                     typeof errorResponse === 'string'
                         ? errorResponse

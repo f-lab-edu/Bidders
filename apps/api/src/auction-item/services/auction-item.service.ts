@@ -5,27 +5,27 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import {
     AccessNotAllowedException,
+    InvalidCategoryException,
     InvalidDatetimeException,
     ItemNotFoundException,
+    ItemUpdateFailedException,
     ItemUpdateNotAllowedException,
 } from '@libs/common';
+import { CategoryService } from '../../category/services/category.service';
 
 @Injectable()
 export class AuctionItemService {
     constructor(
         private readonly auctionItemRepo: AuctionItemRepository,
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+        private readonly categoryService: CategoryService,
     ) {}
 
     async createItem(
         userId: string,
         createAuctionItemDto: CreateAuctionItemDto,
     ) {
-        this.validateDatetime(
-            createAuctionItemDto.start_datetime,
-            createAuctionItemDto.end_datetime,
-        );
-
+        await this.validateAuctionItemCreation(createAuctionItemDto);
         const item = await this.auctionItemRepo.create(
             userId,
             createAuctionItemDto,
@@ -44,8 +44,8 @@ export class AuctionItemService {
     }
 
     async getItems() {
-        const result = await this.auctionItemRepo.findAll();
-        return result;
+        const items = await this.auctionItemRepo.findAll();
+        return items;
     }
 
     async updateItem(
@@ -79,10 +79,10 @@ export class AuctionItemService {
             item.id,
             status,
         );
-        if (updated) {
-            // 아이템 업데이트시 캐시 데이터 삭제
-            await this.deleteCacheItem(item.id);
-        }
+        if (!updated) throw new ItemUpdateFailedException();
+
+        // 아이템 업데이트시 캐시 데이터 삭제
+        await this.deleteCacheItem(item.id);
         return Object.assign(item, { status });
     }
 
@@ -90,7 +90,11 @@ export class AuctionItemService {
         const item = await this.auctionItemRepo.findOne(id);
         if (!item) throw new ItemNotFoundException();
 
-        await this.auctionItemRepo.updateLikes(item.id, ++item.likes);
+        const updated = await this.auctionItemRepo.updateLikes(
+            item.id,
+            ++item.likes,
+        );
+        if (!updated) throw new ItemUpdateFailedException();
         return Object.assign(item, { likes: item.likes });
     }
 
@@ -105,6 +109,20 @@ export class AuctionItemService {
     async deleteCacheItem(id: number) {
         await this.cacheManager.del('/auction/items');
         await this.cacheManager.del(`/auction/item/${id}`);
+    }
+
+    private async validateAuctionItemCreation(
+        createAuctionItemDto: CreateAuctionItemDto,
+    ) {
+        const isCategoryExist = await this.categoryService.isExist(
+            createAuctionItemDto.c_code,
+        );
+        if (!isCategoryExist) throw new InvalidCategoryException();
+
+        this.validateDatetime(
+            createAuctionItemDto.start_datetime,
+            createAuctionItemDto.end_datetime,
+        );
     }
 
     private validateDatetime(start: string, end: string) {

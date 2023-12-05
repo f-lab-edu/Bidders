@@ -52,7 +52,7 @@ export class AuctionItemController {
         );
     }
 
-    @ApiOperation({ summary: '경매 상품 목록 리스트' })
+    @ApiOperation({ summary: '경매 상품 리스트' })
     @ApiOkResponse({ description: '상품 리스트', type: AuctionItemListDto })
     @UseInterceptors(
         CacheInterceptor,
@@ -65,7 +65,10 @@ export class AuctionItemController {
     }
 
     @ApiOperation({ summary: '상품 조회' })
-    @ApiOkResponse()
+    @ApiOkResponse({
+        description: '입찰 내역과 함께 상품 조회',
+        type: AuctionItemBidsDto,
+    })
     @ApiParam({
         required: true,
         name: 'itemId',

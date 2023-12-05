@@ -8,11 +8,7 @@ import {
     UpdateAuctionItemDto,
 } from '@libs/dto';
 import { plainToInstance } from 'class-transformer';
-import {
-    AccessNotAllowedException,
-    ItemNotFoundException,
-    ItemUpdateFailedException,
-} from '@libs/common';
+import { AccessNotAllowedException, ItemNotFoundException } from '@libs/common';
 
 @Injectable()
 export class AuctionItemRepository {
@@ -68,13 +64,13 @@ export class AuctionItemRepository {
 
     async updateStatus(id: number, status: number) {
         const result = await this.repo.update(id, { status });
-        if (!result.affected) throw new ItemUpdateFailedException();
+        if (!result.affected) return false;
         return true;
     }
 
     async updateLikes(id: number, likes: number) {
         const result = await this.repo.update(id, { likes });
-        if (!result.affected) throw new ItemUpdateFailedException();
+        if (!result.affected) return false;
         return true;
     }
 

@@ -7,7 +7,7 @@ const timeOptions = {
 };
 
 export class AuctionItemDto {
-    @ApiProperty({ description: '상품 id', example: 1 })
+    @ApiProperty({ description: '상품 id', example: 10 })
     @Expose()
     id: number;
 

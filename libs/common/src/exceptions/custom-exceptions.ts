@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
+/* User Module */
 export class UserNotFoundException extends HttpException {
     constructor() {
         super(
@@ -26,6 +27,8 @@ export class InvalidPasswordException extends HttpException {
         );
     }
 }
+
+/* Authorization */
 
 export class TokenMissingException extends HttpException {
     constructor() {
@@ -54,9 +57,19 @@ export class LoginRequiredException extends HttpException {
     }
 }
 
+/* Auction-Item Module */
 export class InvalidDatetimeException extends HttpException {
     constructor(message: string) {
         super({ message, error: 'Bad Request' }, HttpStatus.BAD_REQUEST);
+    }
+}
+
+export class InvalidCategoryException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Invalid category code', error: 'Bad Request' },
+            HttpStatus.BAD_REQUEST,
+        );
     }
 }
 
@@ -92,6 +105,37 @@ export class AccessNotAllowedException extends HttpException {
         super(
             { message: 'Access not allowed', error: 'Forbidden' },
             HttpStatus.FORBIDDEN,
+        );
+    }
+}
+
+/* Category Module */
+export class DuplicateCategoryException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Category code in use', error: 'Conflict' },
+            HttpStatus.CONFLICT,
+        );
+    }
+}
+
+export class CategoryNotFoundException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Category not found', error: 'Not Found' },
+            HttpStatus.NOT_FOUND,
+        );
+    }
+}
+
+export class CategoryUpdateFailedException extends HttpException {
+    constructor() {
+        super(
+            {
+                message: 'Category update failed',
+                error: 'Internal Server Error',
+            },
+            HttpStatus.INTERNAL_SERVER_ERROR,
         );
     }
 }
