@@ -1,12 +1,6 @@
 import { IUserPayload, JwtService } from '@libs/util/jwt';
-import {
-    BadRequestException,
-    CanActivate,
-    ExecutionContext,
-    ForbiddenException,
-    Injectable,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { LoginRequiredException, TokenMissingException } from '../exceptions';
 
 @Injectable()
 export class TokenRefreshGuard implements CanActivate {
@@ -15,8 +9,7 @@ export class TokenRefreshGuard implements CanActivate {
     async canActivate(context: ExecutionContext) {
         const request = context.switchToHttp().getRequest();
         const authorizationHeader = request.headers['authorization'];
-        if (!authorizationHeader)
-            throw new BadRequestException('refresh-token is null');
+        if (!authorizationHeader) throw new TokenMissingException();
 
         const rtk = authorizationHeader.split('Bearer ')[1];
         const payload = this.decodeToken(rtk);
@@ -35,17 +28,12 @@ export class TokenRefreshGuard implements CanActivate {
         const isValidate = await this.jwtService.validateRtk(payload.id, rtk);
         if (!isValidate) {
             this.jwtService.delete(payload.id);
-            throw new ForbiddenException('Should login again');
+            throw new LoginRequiredException();
         }
     }
 
     private decodeToken(token: string) {
-        try {
-            const decoded = this.jwtService.verify(token);
-            return decoded;
-        } catch (error) {
-            if (error.message === 'JWT_MALFORMED')
-                throw new UnauthorizedException('refresh-token is invalid');
-        }
+        const decoded = this.jwtService.verify(token);
+        return decoded;
     }
 }

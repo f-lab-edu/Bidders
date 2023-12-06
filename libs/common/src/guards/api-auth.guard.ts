@@ -1,11 +1,6 @@
-import {
-    BadRequestException,
-    CanActivate,
-    ExecutionContext,
-    Injectable,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@libs/util/jwt';
+import { TokenMissingException } from '../exceptions';
 
 @Injectable()
 export class ApiAuthGuard implements CanActivate {
@@ -14,8 +9,7 @@ export class ApiAuthGuard implements CanActivate {
     canActivate(context: ExecutionContext) {
         const request = context.switchToHttp().getRequest();
         const authorizationHeader = request.headers['authorization'];
-        if (!authorizationHeader)
-            throw new BadRequestException('api-token is null');
+        if (!authorizationHeader) throw new TokenMissingException();
 
         const token = authorizationHeader.split('Bearer ')[1];
         const payload = this.decodeToken(token);
@@ -25,12 +19,7 @@ export class ApiAuthGuard implements CanActivate {
     }
 
     private decodeToken(token: string) {
-        try {
-            const decoded = this.jwtService.verify(token);
-            return decoded;
-        } catch (error) {
-            if (error.message === 'JWT_MALFORMED')
-                throw new UnauthorizedException('api-token is invalid');
-        }
+        const decoded = this.jwtService.verify(token);
+        return decoded;
     }
 }

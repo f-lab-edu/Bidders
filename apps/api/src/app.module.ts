@@ -10,9 +10,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SwaggerModule } from '@libs/swagger';
 import { dataSourceConfig } from '@libs/database';
-import { LoggerMiddleware } from '@libs/common';
-import { APP_PIPE } from '@nestjs/core';
+import { GlobalExceptionFilter, LoggerMiddleware } from '@libs/common';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { UserModule } from './user/user.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import redisStore from 'cache-manager-ioredis';
+import { AuctionItemModule } from './auction-item/auction-item.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
     imports: [
@@ -21,8 +25,21 @@ import { UserModule } from './user/user.module';
             useFactory: dataSourceConfig,
             inject: [ConfigService],
         }),
+        CacheModule.registerAsync({
+            isGlobal: true,
+            useFactory: async (configService: ConfigService) => {
+                return {
+                    store: redisStore,
+                    host: configService.get('REDIS_HOST'),
+                    port: configService.get('REDIS_PORT'),
+                };
+            },
+            inject: [ConfigService],
+        }),
         SwaggerModule,
         UserModule,
+        CategoryModule,
+        AuctionItemModule,
     ],
     controllers: [AppController],
     providers: [
@@ -33,6 +50,10 @@ import { UserModule } from './user/user.module';
                 whitelist: true,
                 transform: true,
             }),
+        },
+        {
+            provide: APP_FILTER,
+            useClass: GlobalExceptionFilter,
         },
     ],
 })

@@ -1,0 +1,34 @@
+### Create category
+# @name createRequest
+POST http://localhost:4000/category
+Content-Type: application/json
+
+{
+    "c_code": "0002",
+    "c_name": "기본 아이템2"
+}
+
+
+###
+@code = {{createRequest.response.body.c_code}}
+###
+
+
+### Category list
+GET http://localhost:4000/categories
+
+
+### Get category
+GET http://localhost:4000/category/{{code}}
+
+
+### Update category
+PUT http://localhost:4000/category/{{code}}
+Content-Type: application/json
+
+{
+    "c_code": "0003",
+    "c_name": "기본 아이템3"
+}
+
+

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import jwt from 'jsonwebtoken';
 import { IExpireOpt, IUserPayload } from './interfaces/jwt.interface';
 import { RedisClientService } from '@libs/database';
+import { JwtMalformedException } from '@libs/common';
 
 @Injectable()
 export class JwtService {
@@ -30,7 +31,7 @@ export class JwtService {
             );
             return decoded as IUserPayload;
         } catch (error) {
-            throw new Error('JWT_MALFORMED');
+            throw new JwtMalformedException();
         }
     }
 
