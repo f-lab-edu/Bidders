@@ -9,6 +9,7 @@ import {
     Patch,
     Post,
     Put,
+    Query,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
@@ -26,6 +27,7 @@ import {
     AuctionItemDto,
     AuctionItemListDto,
     CreateAuctionItemDto,
+    SearchAuctionItemsDto,
     UpdateAuctionItemDto,
 } from '@libs/dto';
 import { IUserPayload } from '@libs/util/jwt';
@@ -58,7 +60,7 @@ export class AuctionItemController {
         CacheInterceptor,
         new SerializeInterceptor(AuctionItemListDto),
     )
-    @CacheTTL(300) // ttl: seconds
+    @CacheTTL(60 * 60 * 24) // ttl: seconds
     @Get('items')
     async getItems() {
         return this.auctionItemService.getItems();
@@ -78,7 +80,7 @@ export class AuctionItemController {
         CacheInterceptor,
         new SerializeInterceptor(AuctionItemBidsDto),
     )
-    @CacheTTL(300)
+    @CacheTTL(60 * 60 * 24)
     @Get('item/:itemId')
     async itemWithBids(@Param('itemId', ParseIntPipe) itemId: number) {
         return await this.auctionItemService.getItemWithBids(itemId);
@@ -150,5 +152,16 @@ export class AuctionItemController {
         @User() user: IUserPayload,
     ) {
         return await this.auctionItemService.deleteItem(itemId, user.id);
+    }
+
+    @ApiOperation({ summary: '경매 상품 검색' })
+    @ApiOkResponse({
+        description: '검색 상품 리스트',
+        type: AuctionItemListDto,
+    })
+    @UseInterceptors(new SerializeInterceptor(AuctionItemListDto))
+    @Get('items/search')
+    async search(@Query() searchDto: SearchAuctionItemsDto) {
+        return await this.auctionItemService.searchItems(searchDto);
     }
 }

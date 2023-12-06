@@ -23,12 +23,12 @@ Content-Type: application/json
 
 {
   "c_code": "0001",
-  "title": "경매 등록 상품 제목",
-  "content": "상품 내용 상세",
+  "title": "경매 등록 상품 제목2",
+  "content": "상품 내용 상세2",
   "image": "https://auction-item.image.url",
   "start_datetime": "2023-12-12 15:00:00",
   "end_datetime": "2023-12-15 22:00:00",
-  "start_price": 10000
+  "start_price": 32000
 }
 
 
@@ -68,3 +68,34 @@ PATCH http://localhost:4000/auction/item/{{id}}/status
 ### Update auction item likes
 PATCH http://localhost:4000/auction/item/{{id}}/likes
 Authorization: Bearer {{atk}}
+
+###
+@code = 0001
+@minPrice = 10000
+@maxPrice = 30000
+###
+
+
+### Search auction items
+GET http://localhost:4000/auction/items/search
+
+###
+GET http://localhost:4000/auction/items/search?c_code={{code}}
+
+###
+GET http://localhost:4000/auction/items/search?c_code={{code}}&minPrice={{minPrice}}
+
+###
+GET http://localhost:4000/auction/items/search?c_code={{code}}&maxPrice={{maxPrice}}
+
+###
+GET http://localhost:4000/auction/items/search?minPrice={{minPrice}}
+
+###
+GET http://localhost:4000/auction/items/search?maxPrice={{maxPrice}}
+
+###
+GET http://localhost:4000/auction/items/search?minPrice={{minPrice}}&maxPrice={{maxPrice}}
+
+###
+GET http://localhost:4000/auction/items/search?c_code={{code}}&minPrice={{minPrice}}&maxPrice={{maxPrice}}

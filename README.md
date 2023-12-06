@@ -122,3 +122,30 @@ Note over Server: atk & rtk 모두 재발급
 Note over Server: Redis에 저장된 rtk 갱신
 Server-)Client: 2. atk, rtk
 ```
+
+<br>
+
+## Cache 무효화 전략
+
+```mermaid
+sequenceDiagram
+
+Client-)Server: GET /auction/items/search?c_code=&minPrice=&maxPrice=
+Note over Server: prefix `search:` 와 queryString(`c_code=&minPrice=&maxPrice=`)을 사용해 cache-key 생성
+Server--)Cache: cached?
+Note over Cache: yes!
+Cache--)Server: cached data
+Server-)Client: 리소스 응답
+Note over Server: cache data가 없다면?
+Server--)DB: 데이터 요청
+DB--)Server: data
+Server--)Cache: cache data
+Server-)Client: 리소스 응답
+Client-)Server: POST /auction/item or PUT /auction/item/{id}
+Server--)DB: 상품 등록 or 업데이트
+Note over Server: Cache 서버에 존재하는 cache-key 중 등록 혹은 변경된 상품 c_code가 포함된 것 필터링
+Note over Server: Cache 서버에 존재하는 cache-key 중 등록 혹은 변경된 상품 start_price가 (minPrice, maxPrice)에 포함된 것 필터링
+Note over Server: 해당 cache-key 데이터들만 삭제
+Server--)Cache: DELETE `search:c_code=&minPrice=&maxPrice=`
+
+```

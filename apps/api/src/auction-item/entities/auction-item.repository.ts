@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import {
     AuctionItemDto,
     CreateAuctionItemDto,
+    SearchAuctionItemsDto,
     UpdateAuctionItemDto,
 } from '@libs/dto';
 import { plainToInstance } from 'class-transformer';
@@ -74,7 +75,7 @@ export class AuctionItemRepository {
         return true;
     }
 
-    async delete(id: number, userId: string) {
+    async delete(id: number) {
         const connection = this.repo.manager.connection;
         const queryRunner = connection.createQueryRunner();
 
@@ -85,9 +86,6 @@ export class AuctionItemRepository {
             // queryRunner를 사용하여 트랜잭션을 관리하는 경우,
             // 모든 데이터베이스 작업은 queryRunner.manager를 통해 수행되어야 한다
             const repo = queryRunner.manager.getRepository(AuctionItem);
-            const item = await repo.findOneBy({ id });
-            if (!item) throw new ItemNotFoundException();
-            if (item.user_id !== userId) throw new AccessNotAllowedException();
 
             const result = await repo.delete(id);
 
@@ -100,10 +98,36 @@ export class AuctionItemRepository {
         }
     }
 
+    async searchItems(searchDto: SearchAuctionItemsDto) {
+        const itemArr = await this.createSearchQuery(
+            searchDto,
+        ).getManyAndCount();
+        return { total: itemArr[1], items: itemArr[0] };
+    }
+
     asAuctionItemDto(auctionItem: AuctionItem | AuctionItem[]) {
         return plainToInstance(AuctionItemDto, auctionItem, {
             excludeExtraneousValues: true,
         });
+    }
+
+    private createSearchQuery(searchDto: SearchAuctionItemsDto) {
+        const { c_code, minPrice, maxPrice } = searchDto;
+        const query = this.repo.createQueryBuilder('item');
+
+        if (c_code) {
+            query.andWhere('item.c_code = :c_code', { c_code });
+        }
+
+        if (minPrice) {
+            query.andWhere('item.start_price >= :minPrice', { minPrice });
+        }
+
+        if (maxPrice) {
+            query.andWhere('item.start_price <= :maxPrice', { maxPrice });
+        }
+
+        return query;
     }
 
     private descByAmount(a: number, b: number) {
