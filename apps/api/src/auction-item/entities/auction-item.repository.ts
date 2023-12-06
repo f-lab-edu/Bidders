@@ -9,7 +9,6 @@ import {
     UpdateAuctionItemDto,
 } from '@libs/dto';
 import { plainToInstance } from 'class-transformer';
-import { AccessNotAllowedException, ItemNotFoundException } from '@libs/common';
 
 @Injectable()
 export class AuctionItemRepository {
