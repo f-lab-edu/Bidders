@@ -20,8 +20,8 @@ import { BidDto, CreateBidDto, UpdateBidDto } from '@libs/dto';
 import { ApiAuthGuard, SerializeInterceptor, User } from '@libs/common';
 import { IUserPayload } from '@libs/util/jwt';
 
-@ApiTags('Bid')
-@Controller('bid')
+@ApiTags('Auction-bid')
+@Controller('auction')
 export class BidController {
     constructor(private readonly bidService: BidService) {}
 
@@ -30,7 +30,7 @@ export class BidController {
     @ApiBearerAuth('bearerAuth')
     @UseGuards(ApiAuthGuard)
     @UseInterceptors(new SerializeInterceptor(BidDto))
-    @Post()
+    @Post('bid')
     async postBid(
         @User() user: IUserPayload,
         @Body() createBidDto: CreateBidDto,
@@ -48,7 +48,7 @@ export class BidController {
     })
     @UseGuards(ApiAuthGuard)
     @UseInterceptors(new SerializeInterceptor(BidDto))
-    @Patch(':bidId')
+    @Patch('bid/:bidId')
     async patchBid(
         @Param('bidId', ParseIntPipe) bidId: number,
         @User() user: IUserPayload,

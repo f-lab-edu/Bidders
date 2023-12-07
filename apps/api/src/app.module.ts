@@ -18,6 +18,7 @@ import redisStore from 'cache-manager-ioredis';
 import { AuctionItemModule } from './auction-item/auction-item.module';
 import { CategoryModule } from './category/category.module';
 import { BidModule } from './bid/bid.module';
+import { AuctionResultModule } from './auction-result/auction-result.module';
 
 @Module({
     imports: [
@@ -42,6 +43,7 @@ import { BidModule } from './bid/bid.module';
         CategoryModule,
         AuctionItemModule,
         BidModule,
+        AuctionResultModule,
     ],
     controllers: [AppController],
     providers: [

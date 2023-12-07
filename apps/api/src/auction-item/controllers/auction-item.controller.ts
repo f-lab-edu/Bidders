@@ -137,7 +137,7 @@ export class AuctionItemController {
         return await this.auctionItemService.updateLikes(itemId);
     }
 
-    @ApiOperation({ summary: '경매 상품 삭제' })
+    @ApiOperation({ summary: '내가 등록한 경매 상품 삭제' })
     @ApiOkResponse({ description: '상품 삭제 성공시 return true' })
     @ApiBearerAuth('bearerAuth')
     @ApiParam({

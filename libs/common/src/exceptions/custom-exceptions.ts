@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 /* User Module */
+
 export class UserNotFoundException extends HttpException {
     constructor() {
         super(
@@ -58,6 +59,7 @@ export class LoginRequiredException extends HttpException {
 }
 
 /* Auction-Item Module */
+
 export class InvalidDatetimeException extends HttpException {
     constructor(message: string) {
         super({ message, error: 'Bad Request' }, HttpStatus.BAD_REQUEST);
@@ -110,6 +112,7 @@ export class ItemAccessNotAllowedException extends HttpException {
 }
 
 /* Category Module */
+
 export class DuplicateCategoryException extends HttpException {
     constructor() {
         super(
@@ -183,6 +186,17 @@ export class BidUpdateFailedException extends HttpException {
         super(
             { message: 'Bid update failed', error: 'Internal Server Error' },
             HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+    }
+}
+
+/* Auction Result Module */
+
+export class InvalidAuctionResultException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Invalid auction result', error: 'Bad Request' },
+            HttpStatus.BAD_REQUEST,
         );
     }
 }

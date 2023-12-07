@@ -11,5 +11,6 @@ import { UtilModule } from '@libs/util';
     imports: [TypeOrmModule.forFeature([Bid]), UtilModule, AuctionItemModule],
     controllers: [BidController],
     providers: [BidService, BidRepository],
+    exports: [BidService],
 })
 export class BidModule {}

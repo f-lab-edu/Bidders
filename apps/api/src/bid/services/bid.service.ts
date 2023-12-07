@@ -46,4 +46,10 @@ export class BidService {
         this.auctionItemService.deleteSingleItemCache(updatedBid.item_id);
         return updatedBid;
     }
+
+    async getBid(id: number) {
+        const bid = await this.bidRepo.findOne(id);
+        if (!bid) throw new BidNotFoundException();
+        return bid;
+    }
 }
