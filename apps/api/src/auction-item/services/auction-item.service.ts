@@ -8,9 +8,9 @@ import {
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import {
-    AccessNotAllowedException,
     InvalidCategoryException,
     InvalidDatetimeException,
+    ItemAccessNotAllowedException,
     ItemNotFoundException,
     ItemUpdateFailedException,
     ItemUpdateNotAllowedException,
@@ -37,8 +37,8 @@ export class AuctionItemService {
         );
         if (item) {
             // 아이템 생성시 캐시 데이터 삭제
-            await this.deleteItemCache();
-            await this.deleteSearchCache(item);
+            this.deleteItemsCache();
+            this.deleteSearchCache(item);
         }
         return item;
     }
@@ -66,7 +66,7 @@ export class AuctionItemService {
         if (!item) throw new ItemNotFoundException();
         if (item.status === 1 || item.start_datetime < new Date())
             throw new ItemUpdateNotAllowedException(); // 경매 진행 중일시 업데이트 불가
-        if (item.user_id !== userId) throw new AccessNotAllowedException();
+        if (item.user_id !== userId) throw new ItemAccessNotAllowedException();
 
         const updatedItem = await this.auctionItemRepo.update(
             item,
@@ -74,8 +74,9 @@ export class AuctionItemService {
         );
         if (updatedItem) {
             // 아이템 업데이트시 캐시 데이터 삭제
-            await this.deleteItemCache(updatedItem.id);
-            await this.deleteSearchCache(updatedItem);
+            this.deleteItemsCache();
+            this.deleteSingleItemCache(updatedItem.id);
+            this.deleteSearchCache(updatedItem);
         }
         return updatedItem;
     }
@@ -92,8 +93,9 @@ export class AuctionItemService {
         if (!updated) throw new ItemUpdateFailedException();
 
         // 아이템 업데이트시 캐시 데이터 삭제
-        await this.deleteItemCache(item.id);
-        await this.deleteSearchCache(item);
+        this.deleteItemsCache();
+        this.deleteSingleItemCache(item.id);
+        this.deleteSearchCache(item);
 
         return Object.assign(item, { status });
     }
@@ -113,13 +115,14 @@ export class AuctionItemService {
     async deleteItem(id: number, userId: string) {
         const item = await this.auctionItemRepo.findOne(id);
         if (!item) throw new ItemNotFoundException();
-        if (item.user_id !== userId) throw new AccessNotAllowedException();
+        if (item.user_id !== userId) throw new ItemAccessNotAllowedException();
 
         const result = await this.auctionItemRepo.delete(item.id);
         if (result.affected) {
             // 아이템 삭제시 캐시 데이터 삭제
-            await this.deleteItemCache(id);
-            await this.deleteSearchCache(item);
+            this.deleteItemsCache();
+            this.deleteSingleItemCache(id);
+            this.deleteSearchCache(item);
         }
         return true;
     }
@@ -141,18 +144,25 @@ export class AuctionItemService {
         return items;
     }
 
+    async isExist(id: number) {
+        const item = await this.auctionItemRepo.findOne(id);
+        if (!item) return false;
+        return true;
+    }
+
     async deleteSearchCache(auctionItem: AuctionItem) {
         const keys = await this.findSearchCacheKeysToDelete(auctionItem);
-        for await (const key of keys) {
-            await this.cacheManager.del(key);
+        for (const key of keys) {
+            this.cacheManager.del(key);
         }
     }
 
-    async deleteItemCache(id?: number) {
-        await this.cacheManager.del('/auction/items');
-        if (id) {
-            await this.cacheManager.del(`/auction/item/${id}`);
-        }
+    deleteItemsCache() {
+        this.cacheManager.del('/auction/items');
+    }
+
+    deleteSingleItemCache(id: number) {
+        this.cacheManager.del(`/auction/item/${id}`);
     }
 
     private async findSearchCacheKeysToDelete(auctionItem: AuctionItem) {
@@ -166,27 +176,34 @@ export class AuctionItemService {
             new Set([...storedKeysWithMinPrice, ...storedKeysWithMaxPrice]),
         );
 
-        const keysWithPrice = storedKeysWithPrice.filter((key: string) => {
-            const queryParams = key.split('&').reduce((acc, v) => {
-                const [_key, _value] = v.split('=');
-                acc[_key] = isNaN(Number(_value)) ? _value : parseInt(_value);
+        const keysWithPriceToDelete = storedKeysWithPrice.filter(
+            (key: string) => {
+                const queryParams = key.split('&').reduce((acc, v) => {
+                    const [_key, _value] = v.split('=');
+                    acc[_key] = isNaN(Number(_value))
+                        ? _value
+                        : parseInt(_value);
 
-                return acc;
-            }, {} as Partial<SearchAuctionItemsDto>);
+                    return acc;
+                }, {} as Partial<SearchAuctionItemsDto>);
 
-            const { minPrice, maxPrice } = queryParams;
-            return (
-                auctionItem.start_price >= minPrice &&
-                auctionItem.start_price <= maxPrice
-            );
-        });
+                const { minPrice, maxPrice } = queryParams;
+                return (
+                    auctionItem.start_price >= minPrice &&
+                    auctionItem.start_price <= maxPrice
+                );
+            },
+        );
 
-        const keysWithCode = await this.cacheManager.store.keys(
+        const keysWithCodeToDelete = await this.cacheManager.store.keys(
             `search:*c_code=${auctionItem.c_code}*`,
         );
 
-        const keySet = new Set([...keysWithCode, ...keysWithPrice]);
-        return Array.from(keySet);
+        const keySetToDelete = new Set([
+            ...keysWithCodeToDelete,
+            ...keysWithPriceToDelete,
+        ]);
+        return Array.from(keySetToDelete);
     }
 
     private createSearchCacheKey(searchDto: SearchAuctionItemsDto) {

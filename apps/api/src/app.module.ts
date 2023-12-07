@@ -17,6 +17,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import redisStore from 'cache-manager-ioredis';
 import { AuctionItemModule } from './auction-item/auction-item.module';
 import { CategoryModule } from './category/category.module';
+import { BidModule } from './bid/bid.module';
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { CategoryModule } from './category/category.module';
         UserModule,
         CategoryModule,
         AuctionItemModule,
+        BidModule,
     ],
     controllers: [AppController],
     providers: [

@@ -100,7 +100,7 @@ export class ItemUpdateFailedException extends HttpException {
     }
 }
 
-export class AccessNotAllowedException extends HttpException {
+export class ItemAccessNotAllowedException extends HttpException {
     constructor() {
         super(
             { message: 'Access not allowed', error: 'Forbidden' },
@@ -135,6 +135,53 @@ export class CategoryUpdateFailedException extends HttpException {
                 message: 'Category update failed',
                 error: 'Internal Server Error',
             },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+    }
+}
+
+/* Bid Module */
+
+export class BidNotFoundException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Bid not found', error: 'Not Found' },
+            HttpStatus.NOT_FOUND,
+        );
+    }
+}
+
+export class BidCreationNotAllowedException extends HttpException {
+    constructor(message: string) {
+        super(
+            {
+                message,
+                error: 'Bad Request',
+            },
+            HttpStatus.BAD_REQUEST,
+        );
+    }
+}
+
+export class BidAccessNotAllowedException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Access not allowed', error: 'Forbidden' },
+            HttpStatus.FORBIDDEN,
+        );
+    }
+}
+
+export class BidUpdateNotAllowedException extends HttpException {
+    constructor(message: string) {
+        super({ message, error: 'Bad Request' }, HttpStatus.BAD_REQUEST);
+    }
+}
+
+export class BidUpdateFailedException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Bid update failed', error: 'Internal Server Error' },
             HttpStatus.INTERNAL_SERVER_ERROR,
         );
     }

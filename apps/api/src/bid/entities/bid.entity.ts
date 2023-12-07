@@ -3,6 +3,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     JoinColumn,
     ManyToOne,
     OneToOne,
@@ -41,6 +42,7 @@ export class Bid extends BaseEntity {
     @JoinColumn({ name: 'user_id' })
     user: User;
 
+    @Index()
     @Column({ type: 'int', nullable: false, comment: '입찰 금액' })
     bid_amount: number;
 

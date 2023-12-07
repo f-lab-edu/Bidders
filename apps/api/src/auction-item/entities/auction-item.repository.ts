@@ -84,9 +84,9 @@ export class AuctionItemRepository {
         try {
             // queryRunner를 사용하여 트랜잭션을 관리하는 경우,
             // 모든 데이터베이스 작업은 queryRunner.manager를 통해 수행되어야 한다
-            const repo = queryRunner.manager.getRepository(AuctionItem);
-
-            const result = await repo.delete(id);
+            const result = await queryRunner.manager.delete(AuctionItem, {
+                id,
+            });
 
             await queryRunner.commitTransaction();
             return result;

@@ -66,7 +66,7 @@ export class AuctionItemController {
         return this.auctionItemService.getItems();
     }
 
-    @ApiOperation({ summary: '상품 조회' })
+    @ApiOperation({ summary: '상품 조회 (입찰 내역 포함)' })
     @ApiOkResponse({
         description: '입찰 내역과 함께 상품 조회',
         type: AuctionItemBidsDto,
