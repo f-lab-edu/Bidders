@@ -48,7 +48,7 @@ export class CategoryService {
         );
         if (!updated) throw new CategoryUpdateFailedException();
 
-        const updatedCategory = Object.assign(updateCategoryDto);
+        const updatedCategory = Object.assign(category, updateCategoryDto);
         return updatedCategory;
     }
 

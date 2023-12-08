@@ -35,7 +35,7 @@ export class CategoryController {
     })
     @UseInterceptors(new SerializeInterceptor(CategoryDto))
     @Post('category')
-    async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
+    async postCategory(@Body() createCategoryDto: CreateCategoryDto) {
         return await this.categoryService.createCategory(createCategoryDto);
     }
 
@@ -56,7 +56,7 @@ export class CategoryController {
     })
     @UseInterceptors(new SerializeInterceptor(CategoryDto))
     @Get('category/:code')
-    async category(@Param('code') code: string) {
+    async getCategory(@Param('code') code: string) {
         return await this.categoryService.getCategory(code);
     }
 
@@ -69,7 +69,7 @@ export class CategoryController {
     })
     @UseInterceptors(new SerializeInterceptor(CategoryDto))
     @Put('category/:code')
-    async updateCategory(
+    async putCategory(
         @Param('code') code: string,
         @Body() updateCategoryDto: UpdateCategoryDto,
     ) {

@@ -4,13 +4,14 @@ import { UserService } from '../services/user.service';
 import { UserController } from './user.controller';
 import { CreateUserDto, SignInDto } from '@libs/dto';
 import { User } from '../entities/user.entity';
-import { IUserPayload, JwtService } from '@libs/util/jwt';
+import { IUserPayload } from '@libs/util/jwt';
+import { ApiAuthGuard } from '@libs/common';
 
 describe('UserController', () => {
     let controller: UserController;
     let fakeAuthService: Partial<AuthService>;
     let fakeUserService: Partial<UserService>;
-    let fakeJwtService: Partial<JwtService>;
+    let fakeApiAuthGuard: Partial<ApiAuthGuard>;
 
     beforeEach(async () => {
         const users: User[] = [];
@@ -41,10 +42,8 @@ describe('UserController', () => {
             },
         };
 
-        fakeJwtService = {
-            verify: (token: string) => {
-                return { id: token } as IUserPayload;
-            },
+        fakeApiAuthGuard = {
+            canActivate: jest.fn(() => true),
         };
 
         const module: TestingModule = await Test.createTestingModule({
@@ -52,9 +51,11 @@ describe('UserController', () => {
             providers: [
                 { provide: AuthService, useValue: fakeAuthService },
                 { provide: UserService, useValue: fakeUserService },
-                { provide: JwtService, useValue: fakeJwtService },
             ],
-        }).compile();
+        })
+            .overrideGuard(ApiAuthGuard)
+            .useValue(fakeApiAuthGuard)
+            .compile();
 
         controller = module.get(UserController);
     });
