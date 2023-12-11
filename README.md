@@ -11,12 +11,13 @@
 ### Setup
 
 -   root 디렉토리에 .env 생성
+-   환경에 따라 다른 .env 파일 로드
 -   production mode
-    -   파일명 : .env.prod
+    -   파일명 : `.env.prod`
 -   development mode
-    -   파일명 : .env.dev
+    -   파일명 : `.env.dev`
 -   test mode
-    -   파일명 : .env.test
+    -   파일명 : `.env.test`
 
 ### Migration scripts
 
@@ -25,25 +26,36 @@
 
 ```sh
 ## let TypeORM generate migration file / --env, --name 옵션 필수
+## --env=dev , --env=test
 $ npm run migration:generate --env= --name=
 
 ## create migration file / --name 옵션 필수
 $ npm run migration:create --name=
 
 ## run migration file / --env 옵션 필수
+## --env=dev , --env=test
 $ npm run migration:run --env=
 
 ## revert migration file / --env 옵션 필수
+## --env=dev , --env=test
 $ npm run migration:revert --env=
 ```
 
 ### Test
 
+-   `.env.test` 파일 필요
+
 ```sh
+## unit test
 $ npm run test
+
+## e2e test
+$ npm run test:e2e
 ```
 
 ### Run
+
+-   `.env.dev` 파일 필요
 
 ```sh
 ## Dev mode
