@@ -16,6 +16,10 @@ describe('Authentication System', () => {
         await app.init();
     });
 
+    afterAll(async () => {
+        await app.close();
+    });
+
     it('handles a sign up request', async () => {
         const email = uuidv4();
         const signUpDto = {

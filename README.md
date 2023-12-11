@@ -11,17 +11,12 @@
 ### Setup
 
 -   root 디렉토리에 .env 생성
-
-```
-NODE_ENV=
-PORT=
-
-DB_HOST=
-DB_PORT=
-DB_USER=
-DB_PASSWORD=
-DB_NAME=
-```
+-   production mode
+    -   파일명 : .env.prod
+-   development mode
+    -   파일명 : .env.dev
+-   test mode
+    -   파일명 : .env.test
 
 ### Migration scripts
 
@@ -29,17 +24,17 @@ DB_NAME=
 -   mysql-migrations 디렉토리에서 마이그레이션 파일 관리
 
 ```sh
-## let TypeORM generate migration file / --name 옵션 필수
-$ npm run migration:generate --name=
+## let TypeORM generate migration file / --env, --name 옵션 필수
+$ npm run migration:generate --env= --name=
 
 ## create migration file / --name 옵션 필수
 $ npm run migration:create --name=
 
-## run migration file
-$ npm run migration:run
+## run migration file / --env 옵션 필수
+$ npm run migration:run --env=
 
-## revert migration file
-$ npm run migration:revert
+## revert migration file / --env 옵션 필수
+$ npm run migration:revert --env=
 ```
 
 ### Test

@@ -50,7 +50,7 @@ export class AuctionItemService {
     }
 
     async getItems() {
-        const cachedItems = this.cacheManager.get('/auction/items');
+        const cachedItems = await this.cacheManager.get('/auction/items');
         if (cachedItems) return cachedItems;
 
         const items = await this.auctionItemRepo.findAll();

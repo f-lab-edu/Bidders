@@ -22,7 +22,10 @@ import { AuctionResultModule } from './auction-result/auction-result.module';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({
+            isGlobal: true,
+            envFilePath: `.env.${process.env.NODE_ENV}`,
+        }),
         TypeOrmModule.forRootAsync({
             useFactory: dataSourceConfig,
             inject: [ConfigService],

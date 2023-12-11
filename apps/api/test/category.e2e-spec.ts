@@ -2,8 +2,6 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import request from 'supertest';
-import { AppDataSource } from '@libs/database';
-import { Category } from '../src/category/entities/category.entity';
 
 describe('Category e2e', () => {
     let app: INestApplication;
@@ -20,15 +18,6 @@ describe('Category e2e', () => {
     });
 
     afterAll(async () => {
-        await AppDataSource.initialize();
-        const categoryRepo = AppDataSource.getRepository(Category);
-        const testCategoryEntity = categoryRepo.create(createCategoryDto);
-        const testCategoryEntity2 = categoryRepo.create(updateCategoryDto);
-
-        await categoryRepo.remove(testCategoryEntity);
-        await categoryRepo.remove(testCategoryEntity2);
-        await AppDataSource.destroy();
-
         await app.close();
     });
 
