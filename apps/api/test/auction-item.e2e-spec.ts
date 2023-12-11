@@ -27,7 +27,7 @@ describe('Auction-item e2e', () => {
         start_price: 10000,
     };
     let userAtk: string;
-    let itemId: string;
+    let itemId: number;
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
