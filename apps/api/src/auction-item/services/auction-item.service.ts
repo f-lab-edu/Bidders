@@ -12,6 +12,7 @@ import {
     InvalidDatetimeException,
     ItemAccessNotAllowedException,
     ItemNotFoundException,
+    ItemStatusInvalidException,
     ItemUpdateFailedException,
     ItemUpdateNotAllowedException,
 } from '@libs/common';
@@ -47,6 +48,12 @@ export class AuctionItemService {
         const itemWithBids = await this.auctionItemRepo.findOneWithBids(id);
         if (!itemWithBids) throw new ItemNotFoundException();
         return itemWithBids;
+    }
+
+    async getItem(id: number) {
+        const item = await this.auctionItemRepo.findOne(id);
+        if (!item) throw new ItemNotFoundException();
+        return item;
     }
 
     async getItems() {
@@ -85,10 +92,16 @@ export class AuctionItemService {
         const item = await this.auctionItemRepo.findOne(id);
         if (!item) throw new ItemNotFoundException();
 
-        const status = item.status ? 0 : 1;
+        let toStatus: number;
+        if (item.status === 0) toStatus = 1;
+        if (item.status === 1) toStatus = 2;
+        if (item.status === 2)
+            throw new ItemStatusInvalidException(
+                'Item status can only be changed up to 2',
+            );
         const updated = await this.auctionItemRepo.updateStatus(
             item.id,
-            status,
+            toStatus,
         );
         if (!updated) throw new ItemUpdateFailedException();
 
@@ -97,7 +110,7 @@ export class AuctionItemService {
         this.deleteSingleItemCache(item.id);
         this.deleteSearchCache(item);
 
-        return Object.assign(item, { status });
+        return Object.assign(item, { status: toStatus });
     }
 
     async updateLikes(id: number) {

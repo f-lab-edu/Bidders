@@ -66,6 +66,10 @@ describe('Bid e2e', () => {
         const { id: item_id } = createItemResponse.body;
         itemId = item_id;
 
+        await request(app.getHttpServer())
+            .patch(`/auction/item/${itemId}/status`)
+            .expect(200);
+
         const createBidDto: CreateBidDto = {
             item_id,
             bid_amount: 11000,

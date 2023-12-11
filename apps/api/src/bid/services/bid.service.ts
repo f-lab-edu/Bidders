@@ -6,6 +6,7 @@ import {
     BidCreationNotAllowedException,
     BidNotFoundException,
     ItemNotFoundException,
+    ItemStatusInvalidException,
 } from '@libs/common';
 import { AuctionItemService } from '../../auction-item/services/auction-item.service';
 
@@ -17,12 +18,16 @@ export class BidService {
     ) {}
 
     async placeBid(userId: string, createBidDto: CreateBidDto) {
-        const isItemExist = await this.auctionItemService.isExist(
+        const item = await this.auctionItemService.getItem(
             createBidDto.item_id,
         );
-        if (!isItemExist) throw new ItemNotFoundException();
+        if (!item) throw new ItemNotFoundException();
+        if (item.status !== 1)
+            throw new ItemStatusInvalidException(
+                'Bidding is possible only when the status is 1',
+            );
 
-        const storedbid = await this.bidRepo.findOneByUserId(userId);
+        const storedbid = await this.bidRepo.findOneByUserId(userId, item.id);
         if (storedbid)
             throw new BidCreationNotAllowedException(
                 'Bidding history exists. Please update your bid.',
@@ -38,6 +43,12 @@ export class BidService {
         if (!storedBid) throw new BidNotFoundException();
         if (storedBid.user_id !== userId)
             throw new BidAccessNotAllowedException();
+
+        const item = await this.auctionItemService.getItem(storedBid.item_id);
+        if (item.status !== 1)
+            throw new ItemStatusInvalidException(
+                'Bidding is possible only when the status is 1',
+            );
 
         const updatedBid = await this.bidRepo.update(
             storedBid.id,

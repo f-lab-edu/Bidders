@@ -111,6 +111,12 @@ export class ItemAccessNotAllowedException extends HttpException {
     }
 }
 
+export class ItemStatusInvalidException extends HttpException {
+    constructor(message: string) {
+        super({ message, error: 'Bad Request' }, HttpStatus.BAD_REQUEST);
+    }
+}
+
 /* Category Module */
 
 export class DuplicateCategoryException extends HttpException {

@@ -58,9 +58,15 @@ describe('AuctionResult e2e', () => {
                 .set('Authorization', `Bearer ${atk}`)
                 .send(createAuctionItemDto)
                 .expect(201);
+            const itemId = createItemResponse.body.id;
+
+            // status 0 -> 1
+            await request(app.getHttpServer())
+                .patch(`/auction/item/${itemId}/status`)
+                .expect(200);
 
             const createBidDto: CreateBidDto = {
-                item_id: createItemResponse.body.id,
+                item_id: itemId,
                 bid_amount: 11000,
             };
 
@@ -71,9 +77,14 @@ describe('AuctionResult e2e', () => {
                 .expect(201);
 
             const createAuctionResultDto: CreateAuctionResultDto = {
-                item_id: createItemResponse.body.id,
+                item_id: itemId,
                 winning_bid_id: createBidResponse.body.id,
             };
+
+            // status 1 -> 2
+            await request(app.getHttpServer())
+                .patch(`/auction/item/${itemId}/status`)
+                .expect(200);
 
             return request(app.getHttpServer())
                 .post('/auction/result')

@@ -15,6 +15,7 @@ import {
     InvalidDatetimeException,
     ItemAccessNotAllowedException,
     ItemNotFoundException,
+    ItemStatusInvalidException,
     ItemUpdateFailedException,
     ItemUpdateNotAllowedException,
 } from '@libs/common';
@@ -241,6 +242,16 @@ describe('AuctionItemService', () => {
 
             await expect(service.updateStatus(1)).rejects.toThrow(
                 ItemNotFoundException,
+            );
+        });
+
+        it('should throw ItemStatusInvalidException if item status is invalid', async () => {
+            fakeAuctionItemRepo.findOne = jest
+                .fn()
+                .mockResolvedValueOnce({ ...mockAuctionItem, status: 2 });
+
+            await expect(service.updateStatus(1)).rejects.toThrow(
+                ItemStatusInvalidException,
             );
         });
 

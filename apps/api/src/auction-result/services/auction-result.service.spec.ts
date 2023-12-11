@@ -6,8 +6,10 @@ import { BidService } from '../../bid/services/bid.service';
 import {
     InvalidAuctionResultException,
     ItemNotFoundException,
+    ItemStatusInvalidException,
 } from '@libs/common';
 import { AuctionResultDto, CreateAuctionResultDto } from '@libs/dto';
+import { AuctionItem } from '../../auction-item/entities/auction-item.entity';
 
 describe('AuctionResultService', () => {
     let service: AuctionResultService;
@@ -24,7 +26,7 @@ describe('AuctionResultService', () => {
             create: jest.fn(),
         };
         fakeAuctionItemService = {
-            isExist: jest.fn(),
+            getItem: jest.fn(),
         };
         fakeBidService = {
             getBid: jest.fn(),
@@ -57,9 +59,9 @@ describe('AuctionResultService', () => {
 
     describe('createAuctionResult', () => {
         it('should throw ItemNotFoundException if item does not exist', async () => {
-            fakeAuctionItemService.isExist = jest
+            fakeAuctionItemService.getItem = jest
                 .fn()
-                .mockResolvedValueOnce(false);
+                .mockResolvedValueOnce(null);
 
             await expect(
                 service.createAuctionResult(createAuctionResultDto),
@@ -67,9 +69,9 @@ describe('AuctionResultService', () => {
         });
 
         it('should throw InvalidAuctionResultException if bid item_id does not match', async () => {
-            fakeAuctionItemService.isExist = jest
+            fakeAuctionItemService.getItem = jest
                 .fn()
-                .mockResolvedValueOnce(true);
+                .mockResolvedValueOnce({ status: 2 } as AuctionItem);
             fakeBidService.getBid = jest
                 .fn()
                 .mockResolvedValueOnce({ item_id: 11 });
@@ -79,13 +81,30 @@ describe('AuctionResultService', () => {
             ).rejects.toThrow(InvalidAuctionResultException);
         });
 
+        it('should throw ItemStatusInvalidException if item status is invalid', async () => {
+            fakeAuctionItemService.getItem = jest
+                .fn()
+                .mockResolvedValueOnce({ status: 1 } as AuctionItem);
+            fakeBidService.getBid = jest
+                .fn()
+                .mockResolvedValueOnce({ item_id: 11 });
+
+            await expect(
+                service.createAuctionResult(createAuctionResultDto),
+            ).rejects.toThrow(ItemStatusInvalidException);
+        });
+
         it('should create an auction result', async () => {
-            fakeAuctionItemService.isExist = jest
+            fakeAuctionItemService.getItem = jest
                 .fn()
                 .mockResolvedValueOnce(true);
             fakeBidService.getBid = jest
                 .fn()
                 .mockResolvedValueOnce({ item_id: 10 });
+            fakeAuctionItemService.getItem = jest
+                .fn()
+                .mockResolvedValueOnce({ status: 2 } as AuctionItem);
+
             fakeAuctionResultRepo.create = jest.fn().mockResolvedValueOnce({
                 item_id: 10,
                 winning_bid_id: 1,

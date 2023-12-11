@@ -5,6 +5,7 @@ import { AuctionItemService } from '../../auction-item/services/auction-item.ser
 import {
     InvalidAuctionResultException,
     ItemNotFoundException,
+    ItemStatusInvalidException,
 } from '@libs/common';
 import { BidService } from '../../bid/services/bid.service';
 
@@ -17,10 +18,14 @@ export class AuctionResultService {
     ) {}
 
     async createAuctionResult(createAuctionResultDto: CreateAuctionResultDto) {
-        const isItemExist = await this.auctionItemService.isExist(
+        const item = await this.auctionItemService.getItem(
             createAuctionResultDto.item_id,
         );
-        if (!isItemExist) throw new ItemNotFoundException();
+        if (!item) throw new ItemNotFoundException();
+        if (item.status !== 2)
+            throw new ItemStatusInvalidException(
+                'Auction result can only be created when the status is 2',
+            );
 
         const bid = await this.bidService.getBid(
             createAuctionResultDto.winning_bid_id,

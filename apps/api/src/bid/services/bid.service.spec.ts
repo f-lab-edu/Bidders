@@ -8,8 +8,10 @@ import {
     BidCreationNotAllowedException,
     BidNotFoundException,
     ItemNotFoundException,
+    ItemStatusInvalidException,
 } from '@libs/common';
 import { Bid } from '../entities/bid.entity';
+import { AuctionItem } from '../../auction-item/entities/auction-item.entity';
 
 describe('BidService', () => {
     let service: BidService;
@@ -35,7 +37,7 @@ describe('BidService', () => {
         };
 
         fakeAuctionItemService = {
-            isExist: jest.fn(),
+            getItem: jest.fn(),
             deleteSingleItemCache: jest.fn(),
         };
 
@@ -59,30 +61,42 @@ describe('BidService', () => {
 
     describe('placeBid', () => {
         it('should throw ItemNotFoundException if item does not exist', async () => {
-            fakeAuctionItemService.isExist = jest
+            fakeAuctionItemService.getItem = jest
                 .fn()
-                .mockResolvedValueOnce(false);
+                .mockResolvedValueOnce(null);
+
             await expect(
                 service.placeBid('qwer-asdf-zxcv', createBidDto),
             ).rejects.toThrow(ItemNotFoundException);
         });
 
-        it('should throw BidCreationNotAllowedException if bidding history exists', async () => {
-            fakeAuctionItemService.isExist = jest
+        it('should throw ItemStatusInvalidException if item status is invalid', async () => {
+            fakeAuctionItemService.getItem = jest
                 .fn()
-                .mockResolvedValueOnce(true);
+                .mockResolvedValueOnce({ status: 0 } as AuctionItem);
+
+            await expect(
+                service.placeBid('qwer-asdf-zxcv', createBidDto),
+            ).rejects.toThrow(ItemStatusInvalidException);
+        });
+
+        it('should throw BidCreationNotAllowedException if bidding history exists', async () => {
+            fakeAuctionItemService.getItem = jest
+                .fn()
+                .mockResolvedValueOnce({ status: 1 } as AuctionItem);
             fakeBidRepo.findOneByUserId = jest
                 .fn()
-                .mockResolvedValueOnce({} as Bid);
+                .mockResolvedValueOnce({ user_id: 'qewr-asdf-zxcv' } as Bid);
+
             await expect(
                 service.placeBid('qewr-asdf-zxcv', createBidDto),
             ).rejects.toThrow(BidCreationNotAllowedException);
         });
 
         it('should create a bid', async () => {
-            fakeAuctionItemService.isExist = jest
+            fakeAuctionItemService.getItem = jest
                 .fn()
-                .mockResolvedValueOnce(true);
+                .mockResolvedValueOnce({ status: 1 } as AuctionItem);
             fakeBidRepo.findOneByUserId = jest.fn().mockResolvedValueOnce(null);
             fakeBidRepo.create = jest.fn().mockResolvedValueOnce(mockBid);
 
@@ -95,6 +109,7 @@ describe('BidService', () => {
     describe('updateBid', () => {
         it('should throw BidNotFoundException if bid not found', async () => {
             fakeBidRepo.findOne = jest.fn().mockResolvedValueOnce(null);
+
             await expect(
                 service.updateBid(1, 'qwer-asdf-zxcv', {
                     bid_amount: 15000,
@@ -107,6 +122,7 @@ describe('BidService', () => {
                 id: 1,
                 user_id: 'zcxv-asdf-qwer',
             });
+
             await expect(
                 service.updateBid(1, 'qwer-asdf-zxcv', {
                     bid_amount: 15000,
@@ -114,8 +130,27 @@ describe('BidService', () => {
             ).rejects.toThrow(BidAccessNotAllowedException);
         });
 
+        it('should throw ItemStatusInvalidException if item status is invalid', async () => {
+            fakeBidRepo.findOne = jest.fn().mockResolvedValueOnce({
+                id: 1,
+                user_id: mockBid.user_id,
+            });
+            fakeAuctionItemService.getItem = jest
+                .fn()
+                .mockResolvedValueOnce({ status: 0 } as AuctionItem);
+
+            await expect(
+                service.updateBid(1, 'qwer-asdf-zxcv', {
+                    bid_amount: 15000,
+                } as UpdateBidDto),
+            ).rejects.toThrow(ItemStatusInvalidException);
+        });
+
         it('should update a bid', async () => {
             fakeBidRepo.findOne = jest.fn().mockResolvedValueOnce(mockBid);
+            fakeAuctionItemService.getItem = jest
+                .fn()
+                .mockResolvedValueOnce({ status: 1 } as AuctionItem);
             fakeBidRepo.update = jest
                 .fn()
                 .mockResolvedValueOnce({ bid_amount: 15000 } as Bid);
@@ -131,6 +166,7 @@ describe('BidService', () => {
     describe('getBid', () => {
         it('should throw BidNotFoundException if bid not found', async () => {
             fakeBidRepo.findOne = jest.fn().mockResolvedValueOnce(null);
+
             await expect(service.getBid(1)).rejects.toThrow(
                 BidNotFoundException,
             );
@@ -138,6 +174,7 @@ describe('BidService', () => {
 
         it('should get a bid', async () => {
             fakeBidRepo.findOne = jest.fn().mockResolvedValueOnce(mockBid);
+
             expect(await service.getBid(1)).toBeDefined();
         });
     });

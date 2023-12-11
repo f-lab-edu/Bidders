@@ -68,8 +68,11 @@ export class BidRepository {
         return bid;
     }
 
-    async findOneByUserId(userId: string) {
-        const bid = await this.repo.findOneBy({ user_id: userId });
+    async findOneByUserId(userId: string, itemId: number) {
+        const bid = await this.repo.findOneBy({
+            user_id: userId,
+            item_id: itemId,
+        });
         return bid;
     }
 
