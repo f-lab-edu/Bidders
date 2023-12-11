@@ -63,6 +63,7 @@ $ npm run start:dev
 ```
 
 <br>
+<br>
 
 ## Authentication flow
 
@@ -131,6 +132,7 @@ Server-)Client: 2. atk, rtk
 ```
 
 <br>
+<br>
 
 ## Cache 무효화 전략
 
@@ -154,5 +156,95 @@ Note over Server: Cache 서버에 존재하는 cache-key 중 등록 혹은 변�
 Note over Server: Cache 서버에 존재하는 cache-key 중 등록 혹은 변경된 상품 start_price가 (minPrice, maxPrice)에 포함된 것 필터링
 Note over Server: 해당 cache-key 데이터들만 삭제
 Server--)Cache: DELETE `search:c_code=&minPrice=&maxPrice=`
+
+```
+
+<br>
+<br>
+
+## DB 정합성
+
+-   Pessimistic Lock(비관적 락)을 사용하여 경매 입찰 트랜잭션 처리
+
+### Bid Process
+
+1. 트랜잭션 시작
+    - 사용자가 경매에 입찰을 할 때, REPEATABLE READ 격리 수준의 트랜잭션 시작
+2. 경매 상품 조회
+    - 데이터베이스에서 해당 경매 상품의 정보를 조회
+    - 입착 가격이 시작 가격 이상인지 확인하기 위함
+    - `pessimistic_read` 락을 적용하여 다른 트랜잭션에서 해당 상품에 대한 쓰기 작업 방지
+3. 최신 입찰 정보 조회
+    - 경매 상품에 대한 최신 입찰 정보 조회
+    - 사용자의 입찰 가격이 현재 최고 입찰 가격보다 높은지 확인하기 위함
+    - `pessimistic_write` 락을 적용하여 다른 트랜잭션에서 데이터의 읽기 및 쓰기 작업 방지
+4. 입찰 데이터 저장
+    - 새로운 입찰 데이터 생성 후 데이터베이스에 저장
+5. 트랜잭션 커밋 or 롤백
+    - 모든 처리가 정상적으로 완료되면 트랜잭션을 커밋하여 데이터베이스에 반영
+    - 오류가 발생하는 경우 트랜잭션을 롤백하여 모든 변경사항 취소
+
+<br>
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    participant DB as Database
+
+    C->>S: Request to place a bid
+    S->>DB: Start Transaction (REPEATABLE READ)
+    Note over DB: 트랜잭션 시작
+
+    DB->>DB: Find AuctionItem (pessimistic_read)
+    Note over DB: 경매 상품 조회 (쓰기 금지)
+
+    DB->>DB: Find Latest Bid (pessimistic_write)
+    Note over DB: 최신 입찰 정보 조회 (읽기/쓰기 금지)
+
+    S->>DB: Save New Bid
+    Note over DB: 새 입찰 데이터 저장
+
+    alt 정상 처리
+        S->>DB: Commit Transaction
+        Note over DB: 트랜잭션 커밋
+    else 오류 발생
+        S->>DB: Rollback Transaction
+        Note over DB: 트랜잭션 롤백
+    end
+
+    Note over DB: 트랜잭션 종료
+    S->>C: Return Response
+
+```
+
+<br>
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    participant DB as Database
+
+    C->>S: Request to update bid
+    S->>DB: Start Transaction (REPEATABLE READ)
+    Note over DB: 트랜잭션 시작
+
+    DB->>DB: Find Bid (pessimistic_write)
+    Note over DB: 입찰 정보 조회 (읽기/쓰기 금지)
+
+    alt Bid amount is valid
+        S->>DB: Update Bid
+        Note over DB: 입찰 정보 업데이트
+
+        S->>DB: Commit Transaction
+        Note over DB: 트랜잭션 커밋
+    else Bid amount is invalid
+        S->>DB: Rollback Transaction
+        Note over DB: 트랜잭션 롤백
+    end
+
+    Note over DB: 트랜잭션 종료
+    S->>C: Return Response
 
 ```
