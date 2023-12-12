@@ -10,7 +10,7 @@
 
 ### Setup
 
--   root 디렉토리에 .env 생성
+-   apps/ 디렉토리 안의 프로젝트 디렉토리 마다 env 파일 생성
 -   환경에 따라 다른 .env 파일 로드
 -   production mode
     -   파일명 : `.env.prod`
@@ -247,4 +247,52 @@ sequenceDiagram
     Note over DB: 트랜잭션 종료
     S->>C: Return Response
 
+```
+
+<br>
+<br>
+
+## Docker
+
+### mysql 컨테이너 진입 이후 database 생성
+
+```sh
+$ mysql -uroot -p
+
+mysql> create database [DB_NAME];
+```
+
+### MySQL 사용자 생성
+
+```sql
+use mysql
+select host, user from user;
+
++-----------+------------------+
+| host      | user             |
++-----------+------------------+
+| %         | root             |
+| localhost | mysql.infoschema |
+| localhost | mysql.session    |
+| localhost | mysql.sys        |
+| localhost | root             |
++-----------+------------------+
+
+create user '[username]'@'%' identified by '[mypassword]';
+select host, user from user;
+
++-----------+------------------+
+| host      | user             |
++-----------+------------------+
+| %         | [username]       |
+| %         | root             |
+| localhost | mysql.infoschema |
+| localhost | mysql.session    |
+| localhost | mysql.sys        |
+| localhost | root             |
++-----------+------------------+
+
+show grants for '[username]'@'%';
+grant all privileges on [DB_NAME].* to '[username]'@'%' with grant option;
+flush privileges;
 ```
