@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 /* User Module */
+
 export class UserNotFoundException extends HttpException {
     constructor() {
         super(
@@ -58,6 +59,7 @@ export class LoginRequiredException extends HttpException {
 }
 
 /* Auction-Item Module */
+
 export class InvalidDatetimeException extends HttpException {
     constructor(message: string) {
         super({ message, error: 'Bad Request' }, HttpStatus.BAD_REQUEST);
@@ -100,7 +102,7 @@ export class ItemUpdateFailedException extends HttpException {
     }
 }
 
-export class AccessNotAllowedException extends HttpException {
+export class ItemAccessNotAllowedException extends HttpException {
     constructor() {
         super(
             { message: 'Access not allowed', error: 'Forbidden' },
@@ -109,7 +111,14 @@ export class AccessNotAllowedException extends HttpException {
     }
 }
 
+export class ItemStatusInvalidException extends HttpException {
+    constructor(message: string) {
+        super({ message, error: 'Bad Request' }, HttpStatus.BAD_REQUEST);
+    }
+}
+
 /* Category Module */
+
 export class DuplicateCategoryException extends HttpException {
     constructor() {
         super(
@@ -136,6 +145,64 @@ export class CategoryUpdateFailedException extends HttpException {
                 error: 'Internal Server Error',
             },
             HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+    }
+}
+
+/* Bid Module */
+
+export class BidNotFoundException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Bid not found', error: 'Not Found' },
+            HttpStatus.NOT_FOUND,
+        );
+    }
+}
+
+export class BidCreationNotAllowedException extends HttpException {
+    constructor(message: string) {
+        super(
+            {
+                message,
+                error: 'Bad Request',
+            },
+            HttpStatus.BAD_REQUEST,
+        );
+    }
+}
+
+export class BidAccessNotAllowedException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Access not allowed', error: 'Forbidden' },
+            HttpStatus.FORBIDDEN,
+        );
+    }
+}
+
+export class BidUpdateNotAllowedException extends HttpException {
+    constructor(message: string) {
+        super({ message, error: 'Bad Request' }, HttpStatus.BAD_REQUEST);
+    }
+}
+
+export class BidUpdateFailedException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Bid update failed', error: 'Internal Server Error' },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+    }
+}
+
+/* Auction Result Module */
+
+export class InvalidAuctionResultException extends HttpException {
+    constructor() {
+        super(
+            { message: 'Invalid auction result', error: 'Bad Request' },
+            HttpStatus.BAD_REQUEST,
         );
     }
 }

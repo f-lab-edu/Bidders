@@ -5,7 +5,11 @@ import { AuthService } from './auth.service';
 import { IExpireOpt, IUserPayload, JwtService } from '@libs/util/jwt';
 import { Test } from '@nestjs/testing';
 import { CreateUserDto, UserDto } from '@libs/dto';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+    DuplicateEmailException,
+    InvalidPasswordException,
+    UserNotFoundException,
+} from '@libs/common';
 
 describe('AuthService', () => {
     let service: AuthService;
@@ -36,7 +40,7 @@ describe('AuthService', () => {
                 const filteredUsers = users.filter(
                     (user) => user.email === email,
                 );
-                console.log('filteredUsers[0]', filteredUsers[0]);
+
                 return Promise.resolve(filteredUsers[0]);
             },
         };
@@ -105,13 +109,13 @@ describe('AuthService', () => {
                 password: 'mypassword',
                 username: 'test-user',
             }),
-        ).rejects.toThrow(BadRequestException);
+        ).rejects.toThrow(DuplicateEmailException);
     });
 
     it('throws an error if user sign in with an unused email', async () => {
         await expect(
             service.signin({ email: 'aa@gmail.com', password: 'mypassword' }),
-        ).rejects.toThrow(NotFoundException);
+        ).rejects.toThrow(UserNotFoundException);
     });
 
     it('throws an error if user sign in with an invalid password', async () => {
@@ -122,7 +126,7 @@ describe('AuthService', () => {
         });
         await expect(
             service.signin({ email: 'test@test.com', password: 'qwer' }),
-        ).rejects.toThrow(BadRequestException);
+        ).rejects.toThrow(InvalidPasswordException);
     });
 
     it('returns a user if correct password is provided', async () => {

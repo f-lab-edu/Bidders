@@ -13,5 +13,6 @@
     "testRegex": ".e2e-spec.ts$",
     "transform": {
         "^.+\\.(t|j)s$": "ts-jest"
-    }
+    },
+    "setupFilesAfterEnv": ["<rootDir>/apps/api/test/setup.ts"]
 }

@@ -16,7 +16,11 @@ describe('Authentication System', () => {
         await app.init();
     });
 
-    it('handles a sign up request', () => {
+    afterAll(async () => {
+        await app.close();
+    });
+
+    it('handles a sign up request', async () => {
         const email = uuidv4();
         const signUpDto = {
             email: `${email}@bidders.com`,

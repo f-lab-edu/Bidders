@@ -17,10 +17,15 @@ import { CacheModule } from '@nestjs/cache-manager';
 import redisStore from 'cache-manager-ioredis';
 import { AuctionItemModule } from './auction-item/auction-item.module';
 import { CategoryModule } from './category/category.module';
+import { BidModule } from './bid/bid.module';
+import { AuctionResultModule } from './auction-result/auction-result.module';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({
+            isGlobal: true,
+            envFilePath: `.env.${process.env.NODE_ENV}`,
+        }),
         TypeOrmModule.forRootAsync({
             useFactory: dataSourceConfig,
             inject: [ConfigService],
@@ -40,6 +45,8 @@ import { CategoryModule } from './category/category.module';
         UserModule,
         CategoryModule,
         AuctionItemModule,
+        BidModule,
+        AuctionResultModule,
     ],
     controllers: [AppController],
     providers: [

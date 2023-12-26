@@ -51,7 +51,7 @@ export class UpdateAuctionItemDto {
     })
     @IsDateString()
     @IsNotEmpty()
-    start_datetime: Date;
+    start_datetime: string;
 
     @ApiProperty({
         required: true,
@@ -60,7 +60,7 @@ export class UpdateAuctionItemDto {
     })
     @IsDateString()
     @IsNotEmpty()
-    end_datetime: Date;
+    end_datetime: string;
 
     @ApiProperty({
         required: true,

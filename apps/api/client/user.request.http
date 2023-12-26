@@ -6,7 +6,7 @@ Content-Type: application/json
 {
     "email": "test2@bidders.com",
     "password": "1234",
-    "username": "test-user2"
+    "username": "test-user-2"
 }
 
 ### Sign in

@@ -48,7 +48,7 @@ export class AuctionItemController {
         @User() user: IUserPayload,
         @Body() createAuctionItemDto: CreateAuctionItemDto,
     ) {
-        return this.auctionItemService.createItem(
+        return await this.auctionItemService.createItem(
             user.id,
             createAuctionItemDto,
         );
@@ -63,10 +63,10 @@ export class AuctionItemController {
     @CacheTTL(60 * 60 * 24) // ttl: seconds
     @Get('items')
     async getItems() {
-        return this.auctionItemService.getItems();
+        return await this.auctionItemService.getItems();
     }
 
-    @ApiOperation({ summary: '상품 조회' })
+    @ApiOperation({ summary: '상품 조회 (입찰 내역 포함)' })
     @ApiOkResponse({
         description: '입찰 내역과 함께 상품 조회',
         type: AuctionItemBidsDto,
@@ -137,7 +137,7 @@ export class AuctionItemController {
         return await this.auctionItemService.updateLikes(itemId);
     }
 
-    @ApiOperation({ summary: '경매 상품 삭제' })
+    @ApiOperation({ summary: '내가 등록한 경매 상품 삭제' })
     @ApiOkResponse({ description: '상품 삭제 성공시 return true' })
     @ApiBearerAuth('bearerAuth')
     @ApiParam({

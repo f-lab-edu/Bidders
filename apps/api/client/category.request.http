@@ -4,8 +4,8 @@ POST http://localhost:4000/category
 Content-Type: application/json
 
 {
-    "c_code": "0002",
-    "c_name": "기본 아이템2"
+    "c_code": "0001",
+    "c_name": "기본 아이템"
 }
 
 

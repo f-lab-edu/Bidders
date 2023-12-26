@@ -4,7 +4,9 @@ import dotenv from 'dotenv';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-dotenv.config(); // .env 파일에서 정의된 환경 변수들을 process.env 객체에 추가
+dotenv.config({
+    path: path.join(__dirname, '../../../', `.env.${process.env.NODE_ENV}`),
+}); // .env 파일에서 정의된 환경 변수들을 process.env 객체에 추가
 const configService = new ConfigService(); // process.env에서 환경 변수 조회
 
 export function dataSourceConfig(configService: ConfigService) {

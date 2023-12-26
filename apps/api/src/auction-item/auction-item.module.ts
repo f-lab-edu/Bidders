@@ -16,5 +16,6 @@ import { CategoryModule } from '../category/category.module';
     ],
     controllers: [AuctionItemController],
     providers: [AuctionItemService, AuctionItemRepository, RedisClientService],
+    exports: [AuctionItemService],
 })
 export class AuctionItemModule {}
