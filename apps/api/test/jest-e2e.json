@@ -14,5 +14,6 @@
     "transform": {
         "^.+\\.(t|j)s$": "ts-jest"
     },
-    "setupFilesAfterEnv": ["<rootDir>/apps/api/test/setup.ts"]
+    "setupFilesAfterEnv": ["<rootDir>/apps/api/test/setup.ts"],
+    "globalSetup": "<rootDir>/apps/api/test/global-setup.ts"
 }
