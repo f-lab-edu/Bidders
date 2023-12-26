@@ -18,7 +18,7 @@ export function dataSourceConfig(configService: ConfigService) {
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         synchronize: false,
-        logging: configService.get<string>('NODE_ENV') === 'development',
+        logging: configService.get<string>('NODE_ENV') === 'dev',
         entities: [
             path.join(__dirname, '../../../', 'apps', '**', '*.entity.{ts,js}'),
         ],

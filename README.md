@@ -11,6 +11,9 @@
 ### Setup
 
 -   apps/ 디렉토리 안의 프로젝트 디렉토리 마다 env 파일 생성
+    -   ./apps/api/.env.prod
+    -   ./apps/api/.env.dev
+    -   ./apps/api/.env.test
 -   환경에 따라 다른 .env 파일 로드
 -   production mode
     -   파일명 : `.env.prod`
@@ -254,18 +257,68 @@ sequenceDiagram
 
 ## Docker
 
-### mysql 컨테이너 진입 이후 database 생성
+### .env
 
-```sh
-$ mysql -uroot -p
+-   루트 디렉토리에 도커 파일용 `.env` 파일 생성
 
-mysql> create database [DB_NAME];
+```text
+REDIS_BINDING_PORT=6379
+REDIS_PORT=6379
+
+MYSQL_BINDING_PORT=3306
+MYSQL_PORT=3306
+MYSQL_ROOT_PASSWORD=mypassword
+TZ=Asia/Seoul
 ```
 
-### MySQL 사용자 생성
+### ./db/mysql/init/init.sql
+
+-   루트 디렉토리 기준 ./db/mysql/init/init.sql 파일 생성
+-   데이터베이스 생성 sql문 작성
 
 ```sql
-use mysql
+## example
+CREATE DATABASE bidders; ## dev 모드 database
+CREATE DATABASE bidders_test; ## test 모드 database
+```
+
+### docker-compose 파일
+
+-   docker-compose.dev.yml
+    -   개발용 docker-compose 파일
+-   docker-compose.test.yml
+    -   테스트용 docker-compose 파일
+-   docker-compose.yml
+    -   배포용 docker-compose 파일
+
+```sh
+## docker-compose 파일 실행
+$ docker-compose -f docker-compose.dev.yml up
+```
+
+### migration 파일 실행
+
+-   bidders-api-dev 컨테이너 접속 후 마이그레이션 스크립트 명령어 실행
+
+```sh
+## 컨테이너 목록 확인
+$ docker ps -a
+
+## 컨테이너 접속
+$ docker exec -it <컨테이너ID or 컨테이너명> /bin/sh
+
+## 마이그레이션 스크립트 명령어 실행
+$ npm run migration:run --env=dev
+$ npm run migration:run --env=test
+```
+
+### MySQL 계정 생성
+
+-   root 계정 이외의 계정으로 접속하고 싶은 경우
+-   MySQL 터미널 접속 후 계정 생성
+
+```sql
+use mysql;
 select host, user from user;
 
 +-----------+------------------+

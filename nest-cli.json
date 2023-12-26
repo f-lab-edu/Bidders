@@ -5,14 +5,7 @@
     "compilerOptions": {
         "deleteOutDir": true,
         "webpack": false,
-        "tsConfigPath": "apps/api/tsconfig.app.json",
-        "assets": [
-            {
-                "include": "config/env/.env.*",
-                "outDir": "dist/apps/api",
-                "watchAssets": true
-            }
-        ]
+        "tsConfigPath": "apps/api/tsconfig.app.json"
     },
     "monorepo": true,
     "root": "apps/api",
@@ -23,14 +16,7 @@
             "entryFile": "main",
             "sourceRoot": "apps/api/src",
             "compilerOptions": {
-                "tsConfigPath": "apps/api/tsconfig.app.json",
-                "assets": [
-                    {
-                        "include": "config/env/.env.*",
-                        "outDir": "dist/apps/api",
-                        "watchAssets": true
-                    }
-                ]
+                "tsConfigPath": "apps/api/tsconfig.app.json"
             }
         },
         "database": {

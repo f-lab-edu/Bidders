@@ -1,16 +1,19 @@
 version: '3'
 services:
-    api:
-        container_name: bidders-api
+    api-dev:
+        container_name: bidders-api-dev
         restart: always
         environment:
             - DB_HOST=mysql
             - REDIS_HOST=redis
         env_file:
-            - ./apps/api/.env.prod
+            - ./apps/api/.env.dev
         build:
             context: .
-            dockerfile: dockerfile.api
+            dockerfile: dockerfile.api.dev
+        volumes:
+            - ./:/bidders
+            - /bidders/node_modules
         ports:
             - 4000:4000
         depends_on:
