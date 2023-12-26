@@ -10,17 +10,51 @@
 
 ### Setup
 
--   apps/ 디렉토리 안의 프로젝트 디렉토리 마다 env 파일 생성
-    -   ./apps/api/.env.prod
-    -   ./apps/api/.env.dev
-    -   ./apps/api/.env.test
--   환경에 따라 다른 .env 파일 로드
--   production mode
-    -   파일명 : `.env.prod`
--   development mode
-    -   파일명 : `.env.dev`
--   test mode
-    -   파일명 : `.env.test`
+-   프로젝트별 환경 파일
+    -   apps/ 디렉토리 안의 프로젝트 디렉토리 마다 env 파일 생성
+        -   ./apps/api/.env.prod
+        -   ./apps/api/.env.dev
+        -   ./apps/api/.env.test
+    -   환경에 따라 다른 .env 파일 로드
+        -   cross-env를 사용해 package.json 파일 내 작성된 스크립트마다 서로 다른 env 파일 로드
+        -   production mode
+            -   파일명 : `.env.prod`
+        -   development mode
+            -   파일명 : `.env.dev`
+        -   test mode
+            -   파일명 : `.env.test`
+
+```text
+PORT=
+
+## DATABASE
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+
+## REDIS
+REDIS_HOST=
+REDIS_PORT=
+
+## SECRET
+JWT_SECRET=
+```
+
+-   docker 환경 파일
+    -   root 디렉토리에 env 파일 생성
+    -   파일명 : `.env`
+
+```text
+REDIS_BINDING_PORT=
+REDIS_PORT=
+
+MYSQL_BINDING_PORT=
+MYSQL_PORT=
+MYSQL_ROOT_PASSWORD=
+TZ=
+```
 
 ### Migration scripts
 
@@ -286,8 +320,6 @@ CREATE DATABASE bidders_test; ## test 모드 database
 
 -   docker-compose.dev.yml
     -   개발용 docker-compose 파일
--   docker-compose.test.yml
-    -   테스트용 docker-compose 파일
 -   docker-compose.yml
     -   배포용 docker-compose 파일
 
