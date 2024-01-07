@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
     IsDateString,
     IsNotEmpty,
@@ -68,6 +69,7 @@ export class UpdateAuctionItemDto {
         example: '10000',
     })
     @IsNumber()
+    @Type(() => Number)
     @IsNotEmpty()
     start_price: number;
 }
