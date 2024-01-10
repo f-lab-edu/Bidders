@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { AuctionItemRepository } from '../entities/auction-item.repository';
 import {
     CreateAuctionItemDto,
+    PaginationDto,
     SearchAuctionItemsDto,
     UpdateAuctionItemDto,
 } from '@libs/dto';
@@ -56,11 +57,30 @@ export class AuctionItemService {
         return item;
     }
 
-    async getItems() {
-        const cachedItems = await this.cacheManager.get('/auction/items');
-        if (cachedItems) return cachedItems;
+    async getItems(paginationDto?: PaginationDto) {
+        const { pageSize, page, defaultPageSize, defaultPage } = paginationDto;
+        let cachedItems = null;
 
-        const items = await this.auctionItemRepo.findAll();
+        if (pageSize === defaultPageSize && page === defaultPage) {
+            cachedItems = await this.cacheManager.get('/auction/items');
+        } else if (pageSize === defaultPageSize && page !== defaultPage) {
+            cachedItems = await this.cacheManager.get(
+                `/auction/items?pageSize=${pageSize}`,
+            );
+        } else if (pageSize !== defaultPageSize && page === defaultPage) {
+            cachedItems = await this.cacheManager.get(
+                `/auction/items?page=${page}`,
+            );
+        } else {
+            cachedItems = await this.cacheManager.get(
+                `/auction/items?pageSize=${pageSize}&page=${page}`,
+            );
+        }
+
+        if (cachedItems) return cachedItems;
+        const items = await this.auctionItemRepo.findAllPaginated(
+            paginationDto,
+        );
         return items;
     }
 
@@ -170,8 +190,11 @@ export class AuctionItemService {
         }
     }
 
-    deleteItemsCache() {
-        this.cacheManager.del('/auction/items');
+    async deleteItemsCache() {
+        const keys = await this.cacheManager.store.keys('*/auction/items*');
+        for (const key of keys) {
+            this.cacheManager.del(key);
+        }
     }
 
     deleteSingleItemCache(id: number) {

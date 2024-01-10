@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import {
     AuctionItemDto,
     CreateAuctionItemDto,
+    PaginationDto,
     SearchAuctionItemsDto,
     UpdateAuctionItemDto,
 } from '@libs/dto';
@@ -25,11 +26,19 @@ export class AuctionItemRepository {
         return await this.repo.save(item);
     }
 
-    async findAll() {
+    async findAllPaginated(paginationDto: PaginationDto) {
+        const { skip, take } = paginationDto;
+
         const itemArr = await this.repo.findAndCount({
+            skip: skip ?? 0,
+            take: take ?? 10,
             order: { created_at: 'DESC' },
         });
-        return { total: itemArr[1], items: itemArr[0] };
+        return {
+            total: itemArr[1],
+            count: itemArr[0].length,
+            items: itemArr[0],
+        };
     }
 
     async findOne(id: number) {

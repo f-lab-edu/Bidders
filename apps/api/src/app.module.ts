@@ -56,6 +56,7 @@ import { AuctionResultModule } from './auction-result/auction-result.module';
             useValue: new ValidationPipe({
                 whitelist: true,
                 transform: true,
+                transformOptions: { enableImplicitConversion: true },
             }),
         },
         {

@@ -78,9 +78,13 @@ export class AuctionItemDto {
 }
 
 export class AuctionItemListDto {
-    @ApiProperty({ description: '전체 개수', example: 5 })
+    @ApiProperty({ description: '전체 개수', example: 50 })
     @Expose()
     total: number;
+
+    @ApiProperty({ description: '상품 개수', example: 10 })
+    @Expose()
+    count: number;
 
     @ApiProperty({ description: '상품 데이터 리스트', type: [AuctionItemDto] })
     @Expose()

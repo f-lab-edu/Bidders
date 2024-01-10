@@ -27,6 +27,7 @@ import {
     AuctionItemDto,
     AuctionItemListDto,
     CreateAuctionItemDto,
+    PaginationDto,
     SearchAuctionItemsDto,
     UpdateAuctionItemDto,
 } from '@libs/dto';
@@ -62,8 +63,8 @@ export class AuctionItemController {
     )
     @CacheTTL(60 * 60 * 24) // ttl: seconds
     @Get('items')
-    async getItems() {
-        return await this.auctionItemService.getItems();
+    async getItems(@Query() paginationDto: PaginationDto) {
+        return await this.auctionItemService.getItems(paginationDto);
     }
 
     @ApiOperation({ summary: '상품 조회 (입찰 내역 포함)' })
