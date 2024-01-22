@@ -5,8 +5,8 @@ import { BidRepository } from '../entities/bid.repository';
 import { BidDto, CreateBidDto, UpdateBidDto } from '@libs/dto';
 import {
     BidAccessNotAllowedException,
-    BidCreationNotAllowedException,
     BidNotFoundException,
+    DuplicateBidCreationException,
     ItemNotFoundException,
     ItemStatusInvalidException,
 } from '@libs/common';
@@ -80,7 +80,7 @@ describe('BidService', () => {
             ).rejects.toThrow(ItemStatusInvalidException);
         });
 
-        it('should throw BidCreationNotAllowedException if bidding history exists', async () => {
+        it('should throw DuplicateBidCreationException if bidding history exists', async () => {
             fakeAuctionItemService.getItem = jest
                 .fn()
                 .mockResolvedValueOnce({ status: 1 } as AuctionItem);
@@ -90,7 +90,7 @@ describe('BidService', () => {
 
             await expect(
                 service.placeBid('qewr-asdf-zxcv', createBidDto),
-            ).rejects.toThrow(BidCreationNotAllowedException);
+            ).rejects.toThrow(DuplicateBidCreationException);
         });
 
         it('should create a bid', async () => {

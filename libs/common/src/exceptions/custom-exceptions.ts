@@ -172,6 +172,12 @@ export class BidCreationNotAllowedException extends HttpException {
     }
 }
 
+export class DuplicateBidCreationException extends HttpException {
+    constructor(message: string) {
+        super({ message, error: 'Conflict' }, HttpStatus.CONFLICT);
+    }
+}
+
 export class BidAccessNotAllowedException extends HttpException {
     constructor() {
         super(

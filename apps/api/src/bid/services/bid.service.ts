@@ -3,8 +3,8 @@ import { BidRepository } from '../entities/bid.repository';
 import { CreateBidDto, UpdateBidDto } from '@libs/dto';
 import {
     BidAccessNotAllowedException,
-    BidCreationNotAllowedException,
     BidNotFoundException,
+    DuplicateBidCreationException,
     ItemNotFoundException,
     ItemStatusInvalidException,
 } from '@libs/common';
@@ -29,7 +29,7 @@ export class BidService {
 
         const storedbid = await this.bidRepo.findOneByUserId(userId, item.id);
         if (storedbid)
-            throw new BidCreationNotAllowedException(
+            throw new DuplicateBidCreationException(
                 'Bidding history exists. Please update your bid.',
             );
 
