@@ -24,7 +24,9 @@ import { AuctionResultModule } from './auction-result/auction-result.module';
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath: `./apps/api/.env.${process.env.NODE_ENV}`,
+            envFilePath: process.env.NODE_ENV
+                ? `./apps/api/.env.${process.env.NODE_ENV}`
+                : './apps/api/.env.dev',
         }),
         TypeOrmModule.forRootAsync({
             useFactory: dataSourceConfig,
