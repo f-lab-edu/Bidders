@@ -19,9 +19,11 @@ export class AuctionItemRepository {
     ) {}
 
     async create(userId: string, createAuctionItemDto: CreateAuctionItemDto) {
+        const currentPrice = createAuctionItemDto.start_price;
         const item = this.repo.create({
             user_id: userId,
             ...createAuctionItemDto,
+            current_price: currentPrice,
         });
         return await this.repo.save(item);
     }
@@ -67,7 +69,10 @@ export class AuctionItemRepository {
         auctionItem: AuctionItem,
         updateAuctionItemDto: UpdateAuctionItemDto,
     ) {
-        Object.assign(auctionItem, updateAuctionItemDto);
+        Object.assign(auctionItem, {
+            ...updateAuctionItemDto,
+            current_price: updateAuctionItemDto.start_price,
+        });
         return await this.repo.save(auctionItem);
     }
 

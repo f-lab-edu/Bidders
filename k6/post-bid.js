@@ -13,11 +13,9 @@ export const options = {
         http_req_duration: ['p(95)<1000'],
         'http_req_duration{api:bid:post-first}': ['p(95)<1000'],
         'http_req_duration{api:bid:post}': ['p(95)<1000'],
-        'http_req_duration{api:bid:patch}': ['p(95)<1000'],
         checks: ['rate>=0.95'],
         'checks{api:bid:post-first}': ['rate>=0.95'],
         'checks{api:bid:post}': ['rate>=0.95'],
-        'checks{api:bid:patch}': ['rate>=0.95'],
     },
     stages: [
         { duration: '1m', target: 1000 },
@@ -45,7 +43,7 @@ export default function () {
     response = http.get(`${__ENV.BASE_URL}/user/me/`, {
         headers: { Authorization: `Bearer ${atk}` },
     });
-    const userId = response.json().id;
+    // const userId = response.json().id;
 
     // get items
     response = http.get(`${__ENV.BASE_URL}/auction/items/`);
@@ -57,39 +55,9 @@ export default function () {
     let itemResponse = http.get(
         `${__ENV.BASE_URL}/auction/item/${randItem.id}`,
     );
-    const myBid = itemResponse.json().bids.filter((v) => v.user_id === userId);
     sleep(randomIntBetween(1, 5));
 
-    // no my bid and no other bids
-    if (!myBid[0] && !itemResponse.json().bids.length) {
-        response = http.post(
-            `${__ENV.BASE_URL}/auction/bid/`,
-            {
-                item_id: randItem.id,
-                bid_amount: randItem.start_price,
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${atk}`,
-                },
-                tags: { api: 'bid:post-first' },
-            },
-        );
-        sleep(1);
-
-        check(
-            response,
-            {
-                'status is 201': (res) => res.status === 201,
-            },
-            {
-                api: 'bid:post-first',
-            },
-        );
-    }
-
-    // no my bid but other bids exist
-    if (!myBid[0] && itemResponse.json().bids.length) {
+    if (itemResponse.json().bids.length) {
         const newAmount = itemResponse.json().bids[0].bid_amount + 100;
         response = http.post(
             `${__ENV.BASE_URL}/auction/bid/`,
@@ -115,21 +83,18 @@ export default function () {
                 api: 'bid:post',
             },
         );
-    }
-
-    // if my bid exists
-    if (myBid[0]) {
-        const newAmount = itemResponse.json().bids[0].bid_amount + 100;
-        response = http.patch(
-            `${__ENV.BASE_URL}/auction/bid/${myBid[0].id}/`,
+    } else {
+        response = http.post(
+            `${__ENV.BASE_URL}/auction/bid/`,
             {
-                bid_amount: newAmount,
+                item_id: randItem.id,
+                bid_amount: randItem.start_price,
             },
             {
                 headers: {
                     Authorization: `Bearer ${atk}`,
                 },
-                tags: { api: 'bid:patch' },
+                tags: { api: 'bid:post-first' },
             },
         );
         sleep(1);
@@ -137,10 +102,10 @@ export default function () {
         check(
             response,
             {
-                'status is 200': (res) => res.status === 200,
+                'status is 201': (res) => res.status === 201,
             },
             {
-                api: 'bid:patch',
+                api: 'bid:post-first',
             },
         );
     }

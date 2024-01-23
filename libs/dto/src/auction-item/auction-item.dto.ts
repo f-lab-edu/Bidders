@@ -69,6 +69,13 @@ export class AuctionItemDto {
     start_price: number;
 
     @ApiProperty({
+        description: '현재 가격',
+        example: '10000',
+    })
+    @Expose()
+    current_price: number;
+
+    @ApiProperty({
         description: '상품 등록 시간',
         example: '2023-12-15 22:00:00',
     })

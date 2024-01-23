@@ -9,6 +9,7 @@ import {
     OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
+    VersionColumn,
 } from 'typeorm';
 import { Bid } from '../../bid/entities/bid.entity';
 import { AuctionResult } from '../../auction-result/entities/auction-result.entity';
@@ -108,6 +109,17 @@ export class AuctionItem extends BaseEntity {
         comment: '시작 입찰 가격',
     })
     start_price: number;
+
+    @Column({
+        type: 'int',
+        nullable: false,
+        default: 0,
+        comment: '현재 입찰 가격',
+    })
+    current_price: number;
+
+    @VersionColumn()
+    version: number;
 
     @CreateDateColumn({ type: 'datetime' })
     created_at: Date;

@@ -7,10 +7,6 @@ const timeOptions = {
 };
 
 export class BidDto {
-    @ApiProperty({ description: '입찰 id', example: 1 })
-    @Expose()
-    id: number;
-
     @ApiProperty({ description: '상품 id', example: 10 })
     @Expose()
     item_id: number;

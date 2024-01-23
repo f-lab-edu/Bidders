@@ -4,7 +4,7 @@ POST http://localhost:4000/user/signin
 Content-Type: application/json
 
 {
-    "email": "test2@bidders.com",
+    "email": "test@bidders.com",
     "password": "1234"
 }
 
@@ -19,7 +19,7 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "c_code": "0001",
+  "c_code": "0000",
   "title": "경매 등록 상품 제목",
   "content": "상품 내용 상세",
   "image": "https://auction-item.image.url",
@@ -47,12 +47,12 @@ Content-Type: application/json
 
 {
   "item_id": {{itemId}},
-  "bid_amount": 20000
+  "bid_amount": 21000
 }
 
 
 ###
-@bidId = {{createBidRequest.response.body.id}}
+@userId = {{createBidRequest.response.body.user_id}}
 ###
 
 
@@ -66,5 +66,5 @@ Content-Type: application/json
 
 {
   "item_id": {{itemId}},
-  "winning_bid_id": {{bidId}}
+  "user_id": "{{userId}}"
 }
