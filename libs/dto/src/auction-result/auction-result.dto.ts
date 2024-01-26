@@ -6,9 +6,9 @@ export class AuctionResultDto {
     @Expose()
     item_id: number;
 
-    @ApiProperty({ description: '입찰 id', example: 1 })
+    @ApiProperty({ description: '사용자 id', example: 1 })
     @Expose()
-    winning_bid_id: number;
+    user_id: string;
 
     @ApiProperty({ description: '낙찰 금액', example: 20000 })
     @Expose()

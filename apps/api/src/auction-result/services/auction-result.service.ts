@@ -18,18 +18,15 @@ export class AuctionResultService {
     ) {}
 
     async createAuctionResult(createAuctionResultDto: CreateAuctionResultDto) {
-        const item = await this.auctionItemService.getItem(
-            createAuctionResultDto.item_id,
-        );
+        const { item_id, user_id } = createAuctionResultDto;
+        const item = await this.auctionItemService.getItem(item_id);
         if (!item) throw new ItemNotFoundException();
         if (item.status !== 2)
             throw new ItemStatusInvalidException(
                 'Auction result can only be created when the status is 2',
             );
 
-        const bid = await this.bidService.getBid(
-            createAuctionResultDto.winning_bid_id,
-        );
+        const bid = await this.bidService.getBid(item_id, user_id);
         if (bid.item_id !== createAuctionResultDto.item_id)
             throw new InvalidAuctionResultException();
 

@@ -6,22 +6,14 @@ import {
     Index,
     JoinColumn,
     ManyToOne,
-    OneToOne,
-    PrimaryGeneratedColumn,
+    PrimaryColumn,
 } from 'typeorm';
-import { AuctionResult } from '../../auction-result/entities/auction-result.entity';
 import { AuctionItem } from '../../auction-item/entities/auction-item.entity';
 import { User } from '../../user/entities/user.entity';
 
 @Entity({ name: 'Bids' })
 export class Bid extends BaseEntity {
-    @PrimaryGeneratedColumn({ type: 'int' })
-    id: number;
-
-    @OneToOne(() => AuctionResult, (auctionResult) => auctionResult.bid)
-    auction_result: AuctionResult;
-
-    @Column({ type: 'int', nullable: false, comment: '경매 상품 idx' })
+    @PrimaryColumn({ type: 'int', comment: '경매 상품 idx' })
     item_id: number;
 
     @ManyToOne(() => AuctionItem, (auctionItem) => auctionItem.bids, {
@@ -30,12 +22,7 @@ export class Bid extends BaseEntity {
     @JoinColumn({ name: 'item_id' })
     auction_item: AuctionItem;
 
-    @Column({
-        type: 'varchar',
-        length: 36,
-        nullable: false,
-        comment: '사용자 id',
-    })
+    @PrimaryColumn({ type: 'uuid', length: 36, comment: '사용자 id' })
     user_id: string;
 
     @ManyToOne(() => User, (user) => user.bids, { onDelete: 'CASCADE' })

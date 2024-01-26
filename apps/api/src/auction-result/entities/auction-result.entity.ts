@@ -7,7 +7,6 @@ import {
     PrimaryColumn,
 } from 'typeorm';
 import { AuctionItem } from '../../auction-item/entities/auction-item.entity';
-import { Bid } from '../../bid/entities/bid.entity';
 
 @Entity({ name: 'Auction_results' })
 export class AuctionResult extends BaseEntity {
@@ -20,12 +19,8 @@ export class AuctionResult extends BaseEntity {
     @JoinColumn({ name: 'item_id' })
     auction_item: AuctionItem;
 
-    @PrimaryColumn({ type: 'int', comment: '낙찰된 입찰 idx' })
-    winning_bid_id: number;
-
-    @OneToOne(() => Bid, (bid) => bid.auction_result, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'winning_bid_id' })
-    bid: Bid;
+    @PrimaryColumn({ type: 'uuid', length: 36, comment: '사용자 id' })
+    user_id: string;
 
     @Column({ type: 'int', nullable: false, comment: '낙찰 금액' })
     final_price: number;

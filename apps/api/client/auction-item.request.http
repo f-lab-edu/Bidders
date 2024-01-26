@@ -4,7 +4,7 @@ POST http://localhost:4000/user/signin
 Content-Type: application/json
 
 {
-    "email": "test2@bidders.com",
+    "email": "test@bidders.com",
     "password": "1234"
 }
 
@@ -22,13 +22,13 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "c_code": "0001",
-  "title": "경매 등록 상품 제목2",
-  "content": "상품 내용 상세2",
+  "c_code": "0000",
+  "title": "경매 등록 상품 제목",
+  "content": "상품 내용 상세",
   "image": "https://auction-item.image.url",
-  "start_datetime": "2023-12-12 15:00:00",
-  "end_datetime": "2023-12-15 22:00:00",
-  "start_price": 32000
+  "start_datetime": "2024-01-27 15:00:00",
+  "end_datetime": "2024-01-28 22:00:00",
+  "start_price": 10000
 }
 
 
@@ -51,7 +51,7 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "c_code": "0001",
+  "c_code": "0000",
   "title": "경매 등록 상품 제목 수정",
   "content": "상품 내용 상세 수정",
   "image": "https://auction-item.image.url",
@@ -70,7 +70,7 @@ PATCH http://localhost:4000/auction/item/{{id}}/likes
 Authorization: Bearer {{atk}}
 
 ###
-@code = 0001
+@code = 0000
 @minPrice = 10000
 @maxPrice = 30000
 ###
