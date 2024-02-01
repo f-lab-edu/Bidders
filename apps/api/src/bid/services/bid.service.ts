@@ -27,6 +27,86 @@ export class BidService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
         try {
+            const auctionItem = await queryRunner.manager.findOne(AuctionItem, {
+                where: { id: createBidDto.item_id },
+            });
+            if (createBidDto.bid_amount <= auctionItem.current_price)
+                throw new Error(
+                    'Bid amount must be higher than the current price',
+                );
+
+            const result = await queryRunner.manager
+                .createQueryBuilder()
+                .update(AuctionItem, {
+                    current_price: createBidDto.bid_amount,
+                    version: () => 'version + 1',
+                })
+                .where('id = :id', { id: auctionItem.id })
+                .andWhere('version = :version', {
+                    version: auctionItem.version,
+                })
+                .execute();
+            if (!result.affected) throw new Error('Transaction failed');
+
+            const bid = queryRunner.manager.create(Bid, {
+                user_id: userId,
+                ...createBidDto,
+            });
+            await queryRunner.manager.save(Bid, bid);
+
+            await queryRunner.commitTransaction();
+            return await this.bidRepo.findOne(createBidDto.item_id, userId);
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw new BidCreationNotAllowedException(error.message);
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    async placeBidV2(userId: string, createBidDto: CreateBidDto) {
+        await this.validateBidRequest(createBidDto);
+        const auctionItemRepo = this.dataSource.getRepository(AuctionItem);
+        const bidRepo = this.dataSource.getRepository(Bid);
+
+        const auctionItem = await auctionItemRepo.findOne({
+            where: { id: createBidDto.item_id },
+        });
+        if (createBidDto.bid_amount <= auctionItem.current_price)
+            throw new BidCreationNotAllowedException(
+                'Bid amount must be higher than the current price',
+            );
+
+        const result = await auctionItemRepo
+            .createQueryBuilder()
+            .update({
+                current_price: createBidDto.bid_amount,
+                version: () => 'version + 1',
+            })
+            .where('id = :id', { id: auctionItem.id })
+            .andWhere('version = :version', {
+                version: auctionItem.version,
+            })
+            .execute();
+        if (!result.affected)
+            throw new BidCreationNotAllowedException('Bid creation failed');
+
+        const bid = bidRepo.create({
+            user_id: userId,
+            ...createBidDto,
+        });
+        await bidRepo.save(bid);
+
+        return await this.bidRepo.findOne(createBidDto.item_id, userId);
+    }
+
+    async placeBidDeprecated(userId: string, createBidDto: CreateBidDto) {
+        await this.validateBidRequest(createBidDto);
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
             const latestBid = await queryRunner.manager.findOne(Bid, {
                 where: { item_id: createBidDto.item_id },
                 order: { bid_amount: 'DESC' },
@@ -36,21 +116,19 @@ export class BidService {
                     'Bid amount must be higher than the current highest bid',
                 );
 
-            const bid = queryRunner.manager.create(Bid, {
-                user_id: userId,
-                ...createBidDto,
-            });
-            await queryRunner.manager.save(Bid, bid);
-
             const auctionItem = await queryRunner.manager.findOne(AuctionItem, {
                 where: { id: createBidDto.item_id },
             });
             auctionItem.current_price = createBidDto.bid_amount;
             await queryRunner.manager.save(AuctionItem, auctionItem);
 
-            await queryRunner.commitTransaction();
+            const bid = queryRunner.manager.create(Bid, {
+                user_id: userId,
+                ...createBidDto,
+            });
+            await queryRunner.manager.save(Bid, bid);
 
-            this.auctionItemService.deleteSingleItemCache(createBidDto.item_id);
+            await queryRunner.commitTransaction();
             return await this.bidRepo.findOne(createBidDto.item_id, userId);
         } catch (error) {
             await queryRunner.rollbackTransaction();

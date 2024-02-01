@@ -69,10 +69,15 @@ export default function () {
                 headers: {
                     Authorization: `Bearer ${atk}`,
                 },
+                responseType: 'text',
                 tags: { api: 'bid:post' },
             },
         );
         sleep(1);
+
+        if (response.error) {
+            console.log(response.error);
+        }
 
         check(
             response,
@@ -88,16 +93,21 @@ export default function () {
             `${__ENV.BASE_URL}/auction/bid/`,
             {
                 item_id: randItem.id,
-                bid_amount: randItem.start_price,
+                bid_amount: randItem.start_price + 100,
             },
             {
                 headers: {
                     Authorization: `Bearer ${atk}`,
                 },
+                responseType: 'text',
                 tags: { api: 'bid:post-first' },
             },
         );
         sleep(1);
+
+        if (response.error) {
+            console.log(response.error);
+        }
 
         check(
             response,

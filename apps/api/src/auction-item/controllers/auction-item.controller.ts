@@ -77,11 +77,7 @@ export class AuctionItemController {
         name: 'itemId',
         description: '상품 id',
     })
-    @UseInterceptors(
-        CacheInterceptor,
-        new SerializeInterceptor(AuctionItemBidsDto),
-    )
-    @CacheTTL(60 * 60 * 24)
+    @UseInterceptors(new SerializeInterceptor(AuctionItemBidsDto))
     @Get('item/:itemId')
     async itemWithBids(@Param('itemId', ParseIntPipe) itemId: number) {
         return await this.auctionItemService.getItemWithBids(itemId);
