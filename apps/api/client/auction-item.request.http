@@ -22,11 +22,11 @@ Authorization: Bearer {{atk}}
 Content-Type: application/json
 
 {
-  "c_code": "0000",
+  "c_code": "0001",
   "title": "경매 등록 상품 제목",
   "content": "상품 내용 상세",
   "image": "https://auction-item.image.url",
-  "start_datetime": "2024-02-25 15:00:00",
+  "start_datetime": "2024-02-27 15:00:00",
   "end_datetime": "2024-02-28 22:00:00",
   "start_price": 10000
 }

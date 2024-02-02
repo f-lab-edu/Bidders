@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuctionItem } from './auction-item.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import {
     AuctionItemDto,
     CreateAuctionItemDto,
@@ -125,19 +125,60 @@ export class AuctionItemRepository {
     }
 
     private createSearchQuery(searchDto: SearchAuctionItemsDto) {
-        const { c_code, minPrice, maxPrice } = searchDto;
+        const { c_code, status, minPrice, maxPrice } = searchDto;
         const query = this.repo.createQueryBuilder('item');
 
         if (c_code) {
-            query.andWhere('item.c_code = :c_code', { c_code });
+            const codeArr = c_code.split(',');
+            query.andWhere(
+                new Brackets((qb) => {
+                    codeArr.forEach((v, i) => {
+                        const param = `code${i}`;
+                        if (i === 0) {
+                            qb.where(`item.c_code = :${param}`, { [param]: v });
+                        } else {
+                            qb.orWhere(`item.c_code = :${param}`, {
+                                [param]: v,
+                            });
+                        }
+                    });
+                }),
+            );
         }
 
-        if (minPrice) {
-            query.andWhere('item.start_price >= :minPrice', { minPrice });
+        if (status) {
+            const statusArr = status.split(',');
+            query.andWhere(
+                new Brackets((qb) => {
+                    statusArr.forEach((v, i) => {
+                        const param = `status${i}`;
+                        if (i === 0) {
+                            qb.where(`item.status = :${param}`, { [param]: v });
+                        } else {
+                            qb.orWhere(`item.status = :${param}`, {
+                                [param]: v,
+                            });
+                        }
+                    });
+                }),
+            );
         }
 
-        if (maxPrice) {
-            query.andWhere('item.start_price <= :maxPrice', { maxPrice });
+        if (minPrice || maxPrice) {
+            query.andWhere(
+                new Brackets((qb) => {
+                    if (minPrice) {
+                        qb.andWhere('item.current_price >= :minPrice', {
+                            minPrice,
+                        });
+                    }
+                    if (maxPrice) {
+                        qb.andWhere('item.current_price <= :maxPrice', {
+                            maxPrice,
+                        });
+                    }
+                }),
+            );
         }
 
         return query;

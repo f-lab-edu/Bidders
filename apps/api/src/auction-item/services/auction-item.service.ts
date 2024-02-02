@@ -161,19 +161,20 @@ export class AuctionItemService {
     }
 
     async searchItems(searchDto: SearchAuctionItemsDto) {
-        if (!(await this.categoryService.isExist(searchDto.c_code)))
-            throw new InvalidCategoryException();
+        // if (!(await this.categoryService.isExist(searchDto.c_code)))
+        //     throw new InvalidCategoryException();
 
-        const cacheKey = this.createSearchCacheKey(searchDto);
-        if (cacheKey === 'search:') return await this.getItems();
+        // const cacheKey = this.createSearchCacheKey(searchDto);
+        // if (cacheKey === 'search:') return await this.getItems();
 
-        let items = await this.cacheManager.get(cacheKey);
+        // let items = await this.cacheManager.get(cacheKey);
 
-        if (!items) {
-            items = await this.auctionItemRepo.searchItems(searchDto);
-            await this.cacheManager.set(cacheKey, items, { ttl: 60 * 60 });
-        }
+        // if (!items) {
+        //     items = await this.auctionItemRepo.searchItems(searchDto);
+        //     await this.cacheManager.set(cacheKey, items, { ttl: 60 * 60 });
+        // }
 
+        const items = await this.auctionItemRepo.searchItems(searchDto);
         return items;
     }
 

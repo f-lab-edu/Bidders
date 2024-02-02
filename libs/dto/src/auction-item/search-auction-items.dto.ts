@@ -1,13 +1,21 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsOptional } from 'class-validator';
 
 export class SearchAuctionItemsDto {
-    @ApiProperty({ required: false, description: '분류 코드', example: '0001' })
+    @ApiPropertyOptional({
+        required: false,
+        description: '분류 코드',
+        example: '0001',
+    })
     @IsOptional()
     c_code?: string;
 
-    @ApiProperty({
+    @ApiPropertyOptional({ required: false, description: '상태', example: '1' })
+    @IsOptional()
+    status?: string;
+
+    @ApiPropertyOptional({
         required: false,
         description: '최소 경매 시작금액',
         example: 10000,
@@ -16,7 +24,7 @@ export class SearchAuctionItemsDto {
     @IsOptional()
     minPrice?: number;
 
-    @ApiProperty({
+    @ApiPropertyOptional({
         required: false,
         description: '최대 경매 시작금액',
         example: 20000,
