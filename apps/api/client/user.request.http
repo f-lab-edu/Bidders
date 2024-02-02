@@ -4,9 +4,9 @@ POST http://localhost:4000/user/signup
 Content-Type: application/json
 
 {
-    "email": "test2@bidders.com",
+    "email": "test@bidders.com",
     "password": "1234",
-    "username": "test-user-2"
+    "username": "test-user"
 }
 
 ### Sign in
