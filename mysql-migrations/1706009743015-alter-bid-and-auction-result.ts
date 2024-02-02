@@ -6,6 +6,9 @@ export class AlterBidAndAuctionResult1706009743015
     name = 'AlterBidAndAuctionResult1706009743015';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(
+            `ALTER TABLE \`Auction_results\` DROP FOREIGN KEY \`FK_86fddb85d3161c81f412be3d01f\``,
+        );
         await queryRunner.query('DROP TABLE Bids');
         await queryRunner.query(`DROP TABLE Auction_results`);
         await queryRunner.query(
