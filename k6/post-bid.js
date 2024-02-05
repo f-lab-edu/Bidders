@@ -39,12 +39,6 @@ export default function () {
 
     const atk = response.json().atk;
 
-    // me
-    response = http.get(`${__ENV.BASE_URL}/user/me/`, {
-        headers: { Authorization: `Bearer ${atk}` },
-    });
-    // const userId = response.json().id;
-
     // get items
     response = http.get(`${__ENV.BASE_URL}/auction/items/`);
     const items = response.json().items;
@@ -57,7 +51,7 @@ export default function () {
     );
     sleep(randomIntBetween(1, 5));
 
-    if (itemResponse.json().bids.length) {
+    if (itemResponse.json().bids.length > 0) {
         const newAmount = itemResponse.json().bids[0].bid_amount + 100;
         response = http.post(
             `${__ENV.BASE_URL}/auction/bid/`,
@@ -69,7 +63,6 @@ export default function () {
                 headers: {
                     Authorization: `Bearer ${atk}`,
                 },
-                responseType: 'text',
                 tags: { api: 'bid:post' },
             },
         );
@@ -99,7 +92,6 @@ export default function () {
                 headers: {
                     Authorization: `Bearer ${atk}`,
                 },
-                responseType: 'text',
                 tags: { api: 'bid:post-first' },
             },
         );

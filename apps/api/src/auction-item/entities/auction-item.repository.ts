@@ -51,15 +51,17 @@ export class AuctionItemRepository {
     async findOneWithBids(id: number) {
         const itemWithBids = await this.repo.findOne({
             where: { id },
-            relations: ['bids'],
+            relations: { bids: true },
         });
 
         // 입찰 내역 정렬
         if (itemWithBids && itemWithBids.bids.length) {
             itemWithBids.bids = [
-                ...itemWithBids.bids.sort((a, b) =>
-                    this.descByAmount(a.bid_amount, b.bid_amount),
-                ),
+                ...itemWithBids.bids
+                    .sort((a, b) =>
+                        this.descByAmount(a.bid_amount, b.bid_amount),
+                    )
+                    .slice(0, 10),
             ];
         }
         return itemWithBids;
