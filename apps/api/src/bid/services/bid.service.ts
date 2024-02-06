@@ -27,6 +27,48 @@ export class BidService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
         try {
+            const result = await queryRunner.manager
+                .createQueryBuilder()
+                .update(AuctionItem, {
+                    current_price: createBidDto.bid_amount,
+                    version: () => 'version + 1',
+                })
+                .where('id = :id', { id: createBidDto.item_id })
+                .andWhere('current_price < :newPrice', {
+                    newPrice: createBidDto.bid_amount,
+                })
+                .execute();
+            if (!result.affected) throw new Error('Transaction failed');
+
+            const bidResult = await queryRunner.manager
+                .createQueryBuilder()
+                .insert()
+                .into(Bid)
+                .values({
+                    user_id: userId,
+                    ...createBidDto,
+                })
+                .execute();
+            if (!bidResult.raw.affectedRows)
+                throw new Error('Transaction failed');
+
+            await queryRunner.commitTransaction();
+            return await this.bidRepo.findOne(createBidDto.item_id, userId);
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw new BidCreationNotAllowedException(error.message);
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    async placeBidV2(userId: string, createBidDto: CreateBidDto) {
+        await this.validateBidRequest(createBidDto);
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
             const auctionItem = await queryRunner.manager.findOne(AuctionItem, {
                 where: { id: createBidDto.item_id },
             });
@@ -42,17 +84,23 @@ export class BidService {
                     version: () => 'version + 1',
                 })
                 .where('id = :id', { id: auctionItem.id })
-                .andWhere('version = :version', {
-                    version: auctionItem.version,
+                .andWhere('current_price = :current_price', {
+                    current_price: auctionItem.current_price,
                 })
                 .execute();
             if (!result.affected) throw new Error('Transaction failed');
 
-            const bid = queryRunner.manager.create(Bid, {
-                user_id: userId,
-                ...createBidDto,
-            });
-            await queryRunner.manager.save(Bid, bid);
+            const bidResult = await queryRunner.manager
+                .createQueryBuilder()
+                .insert()
+                .into(Bid)
+                .values({
+                    user_id: userId,
+                    ...createBidDto,
+                })
+                .execute();
+            if (!bidResult.raw.affectedRows)
+                throw new Error('Transaction failed');
 
             await queryRunner.commitTransaction();
             return await this.bidRepo.findOne(createBidDto.item_id, userId);
@@ -62,42 +110,6 @@ export class BidService {
         } finally {
             await queryRunner.release();
         }
-    }
-
-    async placeBidV2(userId: string, createBidDto: CreateBidDto) {
-        await this.validateBidRequest(createBidDto);
-        const auctionItemRepo = this.dataSource.getRepository(AuctionItem);
-        const bidRepo = this.dataSource.getRepository(Bid);
-
-        const auctionItem = await auctionItemRepo.findOne({
-            where: { id: createBidDto.item_id },
-        });
-        if (createBidDto.bid_amount <= auctionItem.current_price)
-            throw new BidCreationNotAllowedException(
-                'Bid amount must be higher than the current price',
-            );
-
-        const result = await auctionItemRepo
-            .createQueryBuilder()
-            .update({
-                current_price: createBidDto.bid_amount,
-                version: () => 'version + 1',
-            })
-            .where('id = :id', { id: auctionItem.id })
-            .andWhere('version = :version', {
-                version: auctionItem.version,
-            })
-            .execute();
-        if (!result.affected)
-            throw new BidCreationNotAllowedException('Bid creation failed');
-
-        const bid = bidRepo.create({
-            user_id: userId,
-            ...createBidDto,
-        });
-        await bidRepo.save(bid);
-
-        return await this.bidRepo.findOne(createBidDto.item_id, userId);
     }
 
     async placeBidDeprecated(userId: string, createBidDto: CreateBidDto) {
