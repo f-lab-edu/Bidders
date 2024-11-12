@@ -1,9 +1,19 @@
 {
     "moduleFileExtensions": ["js", "json", "ts"],
-    "rootDir": ".",
+    "rootDir": "../../../",
+    "modulePaths": ["<rootDir>"],
+    "moduleNameMapper": {
+        "^@libs/util(|/.*)$": "<rootDir>/libs/util/src/$1",
+        "^@libs/swagger(|/.*)$": "<rootDir>/libs/swagger/src/$1",
+        "^@libs/dto(|/.*)$": "<rootDir>/libs/dto/src/$1",
+        "^@libs/database(|/.*)$": "<rootDir>/libs/database/src/$1",
+        "^@libs/common(|/.*)$": "<rootDir>/libs/common/src/$1"
+    },
     "testEnvironment": "node",
     "testRegex": ".e2e-spec.ts$",
     "transform": {
         "^.+\\.(t|j)s$": "ts-jest"
-    }
+    },
+    "setupFilesAfterEnv": ["<rootDir>/apps/api/test/setup.ts"],
+    "globalSetup": "<rootDir>/apps/api/test/global-setup.ts"
 }

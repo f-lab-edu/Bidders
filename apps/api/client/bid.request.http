@@ -1,0 +1,65 @@
+### Sign in
+# @name signinRequest
+POST http://localhost:4000/user/signin
+Content-Type: application/json
+
+{
+    "email": "test@bidders.com",
+    "password": "1234"
+}
+
+###
+@atk = {{signinRequest.response.body.atk}}
+###
+
+### Create auction item
+# @name createItemRequest
+POST http://localhost:4000/auction/item
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "c_code": "0000",
+  "title": "경매 등록 상품 제목",
+  "content": "상품 내용 상세",
+  "image": "https://auction-item.image.url",
+  "start_datetime": "2999-12-12 15:00:00",
+  "end_datetime": "2999-12-15 22:00:00",
+  "start_price": 10000
+}
+
+
+###
+@itemId = {{createItemRequest.response.body.id}}
+###
+
+
+### Update item status
+PATCH http://localhost:4000/auction/item/{{itemId}}/status
+###
+
+
+### Create Bid
+# @name createBidRequest
+POST http://localhost:4000/auction/bid
+Authorization: Bearer {{atk}}
+Content-Type: application/json
+
+{
+  "item_id": {{itemId}},
+  "bid_amount": 22000
+}
+
+
+### Get auction item
+GET http://localhost:4000/auction/item/{{itemId}}
+
+
+# ### Update bid
+# PATCH http://localhost:4000/auction/bid/{{bidId}}
+# Authorization: Bearer {{atk}}
+# Content-Type: application/json
+
+# {
+#   "bid_amount": 30000
+# }

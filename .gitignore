@@ -3,6 +3,12 @@
 /node_modules
 
 package-lock.json
+.env
+.env.dev
+.env.test
+.env.prod
+
+/db
 
 # Logs
 logs
